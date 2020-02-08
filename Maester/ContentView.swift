@@ -9,28 +9,35 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var selection = 0
+    @State private var selection = 1
+    @EnvironmentObject var state: MaesterState
  
     var body: some View {
-        TabView(selection: $selection){
-            Text("First View")
-                .font(.title)
-                .tabItem {
-                    VStack {
-                        Image("first")
-                        Text("First")
-                    }
+        Group {
+            if self.state.new_page {
+                NewPageView().environmentObject(self.state)
+            } else {
+                TabView(selection: $selection){
+                    Text("First View")
+                        .font(.title)
+                        .tabItem {
+                            VStack {
+                                Image("first")
+                                Text("Recent")
+                            }
+                        }
+                        .tag(0)
+                    Text("Second View")
+                        .font(.title)
+                        .tabItem {
+                            VStack {
+                                Image("second")
+                                Text("Search")
+                            }
+                        }
+                        .tag(1)
                 }
-                .tag(0)
-            Text("Second View")
-                .font(.title)
-                .tabItem {
-                    VStack {
-                        Image("second")
-                        Text("Second")
-                    }
-                }
-                .tag(1)
+            }
         }
     }
 }

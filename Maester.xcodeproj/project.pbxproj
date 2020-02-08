@@ -16,6 +16,16 @@
 		F859262623E7E5B6001EDE5C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F859262423E7E5B6001EDE5C /* LaunchScreen.storyboard */; };
 		F859263123E7E5B6001EDE5C /* MaesterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F859263023E7E5B6001EDE5C /* MaesterTests.swift */; };
 		F859263C23E7E5B6001EDE5C /* MaesterUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F859263B23E7E5B6001EDE5C /* MaesterUITests.swift */; };
+		F859264A23E87D5F001EDE5C /* StoreEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F859264923E87D5F001EDE5C /* StoreEntity.swift */; };
+		F859264B23E87D5F001EDE5C /* StoreEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F859264923E87D5F001EDE5C /* StoreEntity.swift */; };
+		F859264D23E89286001EDE5C /* Http.swift in Sources */ = {isa = PBXBuildFile; fileRef = F859264C23E89286001EDE5C /* Http.swift */; };
+		F859264E23E89286001EDE5C /* Http.swift in Sources */ = {isa = PBXBuildFile; fileRef = F859264C23E89286001EDE5C /* Http.swift */; };
+		F859265023E94A33001EDE5C /* Maester.swift in Sources */ = {isa = PBXBuildFile; fileRef = F859264F23E94A33001EDE5C /* Maester.swift */; };
+		F859265123E94A33001EDE5C /* Maester.swift in Sources */ = {isa = PBXBuildFile; fileRef = F859264F23E94A33001EDE5C /* Maester.swift */; };
+		F859268B23EDDC61001EDE5C /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F859268A23EDDC61001EDE5C /* ShareViewController.swift */; };
+		F859268E23EDDC61001EDE5C /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F859268C23EDDC61001EDE5C /* MainInterface.storyboard */; };
+		F859269223EDDC61001EDE5C /* MSE.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = F859268823EDDC61001EDE5C /* MSE.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F859269723EEB6E2001EDE5C /* NewPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F859269623EEB6E2001EDE5C /* NewPageView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,7 +43,28 @@
 			remoteGlobalIDString = F859261223E7E5B5001EDE5C;
 			remoteInfo = Maester;
 		};
+		F859269023EDDC61001EDE5C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F859260B23E7E5B5001EDE5C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F859268723EDDC61001EDE5C;
+			remoteInfo = MSE;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F859266423E966CB001EDE5C /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				F859269223EDDC61001EDE5C /* MSE.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		F859261323E7E5B5001EDE5C /* Maester.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Maester.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -51,6 +82,15 @@
 		F859263723E7E5B6001EDE5C /* MaesterUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MaesterUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F859263B23E7E5B6001EDE5C /* MaesterUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaesterUITests.swift; sourceTree = "<group>"; };
 		F859263D23E7E5B6001EDE5C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F859264923E87D5F001EDE5C /* StoreEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreEntity.swift; sourceTree = "<group>"; };
+		F859264C23E89286001EDE5C /* Http.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Http.swift; sourceTree = "<group>"; };
+		F859264F23E94A33001EDE5C /* Maester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Maester.swift; sourceTree = "<group>"; };
+		F859266523E9673B001EDE5C /* Maester.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Maester.entitlements; sourceTree = "<group>"; };
+		F859268823EDDC61001EDE5C /* MSE.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MSE.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F859268A23EDDC61001EDE5C /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		F859268D23EDDC61001EDE5C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		F859268F23EDDC61001EDE5C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F859269623EEB6E2001EDE5C /* NewPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPageView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +115,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F859268523EDDC61001EDE5C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -84,6 +131,7 @@
 				F859261523E7E5B5001EDE5C /* Maester */,
 				F859262F23E7E5B6001EDE5C /* MaesterTests */,
 				F859263A23E7E5B6001EDE5C /* MaesterUITests */,
+				F859268923EDDC61001EDE5C /* MSE */,
 				F859261423E7E5B5001EDE5C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -94,6 +142,7 @@
 				F859261323E7E5B5001EDE5C /* Maester.app */,
 				F859262C23E7E5B6001EDE5C /* MaesterTests.xctest */,
 				F859263723E7E5B6001EDE5C /* MaesterUITests.xctest */,
+				F859268823EDDC61001EDE5C /* MSE.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -101,14 +150,19 @@
 		F859261523E7E5B5001EDE5C /* Maester */ = {
 			isa = PBXGroup;
 			children = (
+				F859266523E9673B001EDE5C /* Maester.entitlements */,
 				F859261623E7E5B5001EDE5C /* AppDelegate.swift */,
 				F859261823E7E5B5001EDE5C /* SceneDelegate.swift */,
 				F859261D23E7E5B5001EDE5C /* ContentView.swift */,
+				F859269623EEB6E2001EDE5C /* NewPageView.swift */,
 				F859261F23E7E5B6001EDE5C /* Assets.xcassets */,
 				F859262423E7E5B6001EDE5C /* LaunchScreen.storyboard */,
 				F859262723E7E5B6001EDE5C /* Info.plist */,
 				F859261A23E7E5B5001EDE5C /* Maester.xcdatamodeld */,
 				F859262123E7E5B6001EDE5C /* Preview Content */,
+				F859264923E87D5F001EDE5C /* StoreEntity.swift */,
+				F859264F23E94A33001EDE5C /* Maester.swift */,
+				F859264C23E89286001EDE5C /* Http.swift */,
 			);
 			path = Maester;
 			sourceTree = "<group>";
@@ -139,6 +193,16 @@
 			path = MaesterUITests;
 			sourceTree = "<group>";
 		};
+		F859268923EDDC61001EDE5C /* MSE */ = {
+			isa = PBXGroup;
+			children = (
+				F859268A23EDDC61001EDE5C /* ShareViewController.swift */,
+				F859268C23EDDC61001EDE5C /* MainInterface.storyboard */,
+				F859268F23EDDC61001EDE5C /* Info.plist */,
+			);
+			path = MSE;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -149,10 +213,12 @@
 				F859260F23E7E5B5001EDE5C /* Sources */,
 				F859261023E7E5B5001EDE5C /* Frameworks */,
 				F859261123E7E5B5001EDE5C /* Resources */,
+				F859266423E966CB001EDE5C /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				F859269123EDDC61001EDE5C /* PBXTargetDependency */,
 			);
 			name = Maester;
 			productName = Maester;
@@ -195,6 +261,23 @@
 			productReference = F859263723E7E5B6001EDE5C /* MaesterUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		F859268723EDDC61001EDE5C /* MSE */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F859269523EDDC61001EDE5C /* Build configuration list for PBXNativeTarget "MSE" */;
+			buildPhases = (
+				F859268423EDDC61001EDE5C /* Sources */,
+				F859268523EDDC61001EDE5C /* Frameworks */,
+				F859268623EDDC61001EDE5C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MSE;
+			productName = MSE;
+			productReference = F859268823EDDC61001EDE5C /* MSE.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -216,6 +299,9 @@
 						CreatedOnToolsVersion = 11.3.1;
 						TestTargetID = F859261223E7E5B5001EDE5C;
 					};
+					F859268723EDDC61001EDE5C = {
+						CreatedOnToolsVersion = 11.3.1;
+					};
 				};
 			};
 			buildConfigurationList = F859260E23E7E5B5001EDE5C /* Build configuration list for PBXProject "Maester" */;
@@ -234,6 +320,7 @@
 				F859261223E7E5B5001EDE5C /* Maester */,
 				F859262B23E7E5B6001EDE5C /* MaesterTests */,
 				F859263623E7E5B6001EDE5C /* MaesterUITests */,
+				F859268723EDDC61001EDE5C /* MSE */,
 			);
 		};
 /* End PBXProject section */
@@ -263,6 +350,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F859268623EDDC61001EDE5C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F859268E23EDDC61001EDE5C /* MainInterface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -273,7 +368,11 @@
 				F859261C23E7E5B5001EDE5C /* Maester.xcdatamodeld in Sources */,
 				F859261723E7E5B5001EDE5C /* AppDelegate.swift in Sources */,
 				F859261E23E7E5B5001EDE5C /* ContentView.swift in Sources */,
+				F859265023E94A33001EDE5C /* Maester.swift in Sources */,
 				F859261923E7E5B5001EDE5C /* SceneDelegate.swift in Sources */,
+				F859264A23E87D5F001EDE5C /* StoreEntity.swift in Sources */,
+				F859269723EEB6E2001EDE5C /* NewPageView.swift in Sources */,
+				F859264D23E89286001EDE5C /* Http.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,7 +380,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F859264B23E87D5F001EDE5C /* StoreEntity.swift in Sources */,
+				F859265123E94A33001EDE5C /* Maester.swift in Sources */,
 				F859263123E7E5B6001EDE5C /* MaesterTests.swift in Sources */,
+				F859264E23E89286001EDE5C /* Http.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -290,6 +392,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				F859263C23E7E5B6001EDE5C /* MaesterUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F859268423EDDC61001EDE5C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F859268B23EDDC61001EDE5C /* ShareViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -306,6 +416,11 @@
 			target = F859261223E7E5B5001EDE5C /* Maester */;
 			targetProxy = F859263823E7E5B6001EDE5C /* PBXContainerItemProxy */;
 		};
+		F859269123EDDC61001EDE5C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F859268723EDDC61001EDE5C /* MSE */;
+			targetProxy = F859269023EDDC61001EDE5C /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -315,6 +430,14 @@
 				F859262523E7E5B6001EDE5C /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		F859268C23EDDC61001EDE5C /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F859268D23EDDC61001EDE5C /* Base */,
+			);
+			name = MainInterface.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -437,7 +560,9 @@
 		F859264123E7E5B6001EDE5C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Maester/Maester.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Maester/Preview Content\"";
 				DEVELOPMENT_TEAM = HBBSBKXTST;
@@ -457,7 +582,9 @@
 		F859264223E7E5B6001EDE5C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Maester/Maester.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Maester/Preview Content\"";
 				DEVELOPMENT_TEAM = HBBSBKXTST;
@@ -558,6 +685,44 @@
 			};
 			name = Release;
 		};
+		F859269323EDDC61001EDE5C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = HBBSBKXTST;
+				INFOPLIST_FILE = MSE/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.devfans.maester.Maester.MSE;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F859269423EDDC61001EDE5C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = HBBSBKXTST;
+				INFOPLIST_FILE = MSE/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.devfans.maester.Maester.MSE;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -593,6 +758,15 @@
 			buildConfigurations = (
 				F859264723E7E5B6001EDE5C /* Debug */,
 				F859264823E7E5B6001EDE5C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F859269523EDDC61001EDE5C /* Build configuration list for PBXNativeTarget "MSE" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F859269323EDDC61001EDE5C /* Debug */,
+				F859269423EDDC61001EDE5C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

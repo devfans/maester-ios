@@ -12,6 +12,18 @@ import SwiftUI
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    var state = MaesterState()
+
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        if let urlContext = URLContexts.first {
+            let host = urlContext.url.host!
+            let data = try! JSONSerialization.jsonObject(with: Data(base64Encoded: host)!, options: [])
+            if let new_page_data = data as? [String: String], urlContext.url.path == "/newlink" {
+                self.state.new_page = true
+                self.state.new_page_data = new_page_data
+            }
+        }
+    }
 
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
@@ -24,7 +36,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         // Create the SwiftUI view and set the context as the value for the managedObjectContext environment keyPath.
         // Add `@Environment(\.managedObjectContext)` in the views that will need the context.
-        let contentView = ContentView().environment(\.managedObjectContext, context)
+        let contentView = ContentView().environment(\.managedObjectContext, context).environmentObject(self.state)
 
         // Use a UIHostingController as window root view controller.
         if let windowScene = scene as? UIWindowScene {
