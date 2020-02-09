@@ -19,8 +19,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             let host = urlContext.url.host!
             let data = try! JSONSerialization.jsonObject(with: Data(base64Encoded: host)!, options: [])
             if let new_page_data = data as? [String: String], urlContext.url.path == "/newlink" {
-                self.state.new_page = true
+                self.state.entry = .AddPage
                 self.state.new_page_data = new_page_data
+                if let url = new_page_data["url"] {
+                    state.write_page.content = url
+                }
             }
         }
     }

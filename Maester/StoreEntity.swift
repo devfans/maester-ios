@@ -41,10 +41,23 @@ struct Page: Codable {
         content = url
         name = ""
         page_type = PageType.Link
-        category = "test"
+        category = ""
         tags = [String]()
         time = 0
     }
+    
+    public func is_valid() -> Bool {
+        switch self.page_type {
+        case .Link:
+            if self.content.count > 0 && self.category.count > 0 {
+                return true
+            }
+        default:
+            return false
+        }
+        return false
+    }
+    
 }
 
 struct PageIDAction: Codable {
@@ -144,6 +157,26 @@ struct StoreEntity: Codable {
     
     init(in_time: UInt32) {
         time = in_time
+    }
+    
+    public func gen_index() -> (tags: [String: Int], categories: [String: Int]) {
+        var tags = [String: Int]()
+        var cates = [String: Int]()
+        for page in data.values {
+            for tag in page.tags {
+                if tags.keys.contains(tag) {
+                    tags[tag]! += 1
+                } else {
+                    tags[tag] = 1
+                }
+            }
+            if cates.keys.contains(page.category) {
+                cates[page.category]! += 1
+            } else {
+                cates[page.category] =  0
+            }
+        }
+        return (tags, cates)
     }
     
     public mutating func apply_actions(actions: [PageAction]) {
