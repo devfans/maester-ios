@@ -112,7 +112,7 @@ struct PageRow: View {
             HStack {
                 Text(page.name)
                     .font(.system(size: 15))
-                    .foregroundColor(Color.black)
+                    .foregroundColor(Color.black).lineLimit(1)
                 Spacer()
                 ForEach(page.tags, id: \.self) { tag in
                     Text(tag)
@@ -125,7 +125,7 @@ struct PageRow: View {
             HStack {
                 Text(page.content)
                     .font(.system(size: 10))
-                    .foregroundColor(Color.gray)
+                    .foregroundColor(Color.gray).lineLimit(1)
                 Spacer()
                 Text(page.category)
                 .font(.system(size: 12))
@@ -160,7 +160,7 @@ struct ContentView: View {
             
             VStack {
                 SyncStatusView(status: self.$state.sync_status)
-                    .padding(.bottom, -40)
+                    .padding(.bottom, -28)
                     .padding(.top, 0)
             }.frame(width: 30, height: 0).zIndex(100).padding(.top, 0)
             

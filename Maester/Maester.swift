@@ -290,6 +290,7 @@ class MaesterBook {
     }
     
     public func start(_ init_handler: @escaping (SyncStatus) -> Void) {
+        // self.clear_local_data()
         self.load_data(init_handler)
     }
     
@@ -442,12 +443,21 @@ class MaesterBook {
         }
     }
     
+    private func clear_local_data() {
+        let path = self.get_data_root()
+        try? FileManager.default.removeItem(atPath: path)
+    }
+    
     private func should_have_dir(dir: String) {
         try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true, attributes: nil)
     }
     
     private func load_file(file: String) -> Data? {
         return FileManager.default.contents(atPath: file)
+    }
+    
+    private func delete_file(file: String) {
+        try? FileManager.default.removeItem(atPath: file)
     }
     
     private func save_file(file: String, data: Data) -> Bool {
