@@ -12,20 +12,43 @@ import SwiftUI
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-    var state = MaesterState()
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        let state = (UIApplication.shared.delegate as! AppDelegate).state
         if let urlContext = URLContexts.first {
-            let host = urlContext.url.host!
-            let data = try! JSONSerialization.jsonObject(with: Data(base64Encoded: host)!, options: [])
-            if let new_page_data = data as? [String: String], urlContext.url.path == "/newlink" {
-                self.state.entry = .AddPage
-                self.state.new_page_data = new_page_data
-                if let url = new_page_data["url"] {
-                    state.write_page.content = url
+            let url = urlContext.url
+            print(url.absoluteString)
+            print(url.path)
+            print(String(url.path.suffix(from: url.path.index(after: url.path.startIndex))))
+            if let raw = Data(base64Encoded: String(url.path.suffix(from: url.path.index(after: url.path.startIndex)))) {
+                let data = try? JSONSerialization.jsonObject(with: raw, options: [])
+                if let new_page_data = data as? [String: String], url.host == "newlink" {
+                    state.new_page_data = new_page_data
+                    if let url_str = new_page_data["url"] {
+                        state.write_page.content = url_str
+                    }
+                    if let text = new_page_data["text"] {
+                        state.write_page.name = text
+                    }
+                    state.entry = .AddPage
+                    return
                 }
             }
         }
+        /*
+        let data = try! JSONSerialization.jsonObject(with: Data(base64Encoded: host)!, options: [])
+        if let new_page_data = data as? [String: String], urlContext.url.path == "/newlink" {
+            self.state.entry = .AddPage
+            self.state.new_page_data = new_page_data
+            if let url = new_page_data["url"] {
+                state.write_page.content = url
+            }
+        }
+        */
+        
+        print("Failed to parse data carried from share extension!")
+        state.write_page = Page(withLink: "")
+        state.entry = .AddPage
     }
 
 
@@ -36,14 +59,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         // Get the managed object context from the shared persistent container.
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let state = (UIApplication.shared.delegate as! AppDelegate).state;
+        state.book.start { status in
+            print("initial sync state: \(status)")
+            state.sync_status = status
+        }
 
         // Create the SwiftUI view and set the context as the value for the managedObjectContext environment keyPath.
         // Add `@Environment(\.managedObjectContext)` in the views that will need the context.
-        let contentView = ContentView().environment(\.managedObjectContext, context).environmentObject(self.state)
+        let contentView = ContentView().environment(\.managedObjectContext, context).environmentObject(state)
 
         // Use a UIHostingController as window root view controller.
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)
+            
             window.rootViewController = UIHostingController(rootView: contentView)
             self.window = window
             window.makeKeyAndVisible()
@@ -80,7 +109,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Save changes in the application's managed object context when the application transitions to the background.
         (UIApplication.shared.delegate as? AppDelegate)?.saveContext()
     }
-
-
 }
 

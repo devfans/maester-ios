@@ -125,7 +125,7 @@ struct NewPageView: View {
                 Button(action: {
                     let action = PageAction.Put(self.page_id, self.state.write_page)
                     _ = self.state.book.apply_action(action: action)
-                    self.state.book.update()
+                    self.state.sync()
                     NSLog("Added new page")
                     self.state.entry = .Main
                     self.state.new_page_data = [:]

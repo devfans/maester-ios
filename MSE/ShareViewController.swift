@@ -31,7 +31,7 @@ class ShareViewController: SLComposeServiceViewController {
         }
 
         for extensionItem in extensionItems {
-            if let itemProviders = extensionItem.attachments as? [NSItemProvider] {
+            if let itemProviders = extensionItem.attachments as [NSItemProvider]? {
                 for itemProvider in itemProviders {
                     if itemProvider.hasItemConformingToTypeIdentifier(contentTypeText) {
                         itemProvider.loadItem(forTypeIdentifier: contentTypeText, options: nil) { text, error in
@@ -84,12 +84,15 @@ class ShareViewController: SLComposeServiceViewController {
     override func viewWillAppear(_ animated: Bool) {
         // NSLog(self.textString!)
         // let url = URL(string: "maester://test")!
+        
         let data = [
-            "url": self.urlString!
+            "url": self.urlString!,
+            "text": self.textString == nil ? "" : self.textString!
         ];
         let payload = try! JSONSerialization.data(withJSONObject: data, options: []);
-        let host = payload.base64EncodedString()
-        let _ = self.openURL(URL(string: "maester://\(host)/newlink")!)
+        let path = payload.base64EncodedString()
+        _ = self.openURL(URL(string: "maester://newlink/\(path)")!)
+
         self.dismiss(animated: false) {
             self.extensionContext!.completeRequest(returningItems: [], completionHandler: nil)
         }

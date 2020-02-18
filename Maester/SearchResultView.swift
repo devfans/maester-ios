@@ -8,33 +8,71 @@
 
 import SwiftUI
 
+class SearchResult {
+    var results_count = 0
+}
+
 struct SearchResultView: View {
     @EnvironmentObject var state: MaesterState
     
-    func set_read_page(_ page_id: String, _ page: Page) -> PageDetailView {
-        self.state.read_page_id = page_id
-        self.state.read_page = page
-        return PageDetailView()
-    }
+    private let search_types = ["keyword", "category", "tag", "name", "content"]
+    
     var body: some View {
-        VStack {
+        let pi = Binding<Int>(get: { () -> Int in
+            return self.state.search_type
+        }) { (new_index) in
+            self.state.search_type = new_index
+            self.state.search()
+        }
+        return VStack {
+            HStack {
+                Spacer()
+                HStack{
+                    Text("Found \(self.state.search_ressults.count) items for ")
+                    Text(self.state.search_keyword).foregroundColor(Color.blue)
+                }
+            }.padding(.horizontal, 20)
+            Picker(selection: pi, label: Text("")) {
+                ForEach(self.search_types.indices) {
+                    Text(self.search_types[$0])
+                }
+                }.pickerStyle(SegmentedPickerStyle())
             List {
-                ForEach(self.state.book.search(self.state.search_keyword, self.state.search_type), id: \.self) { page_id in
+                ForEach(self.state.search_ressults, id: \.self) { page_id in
                     Group {
                         if self.state.book.has_page(id: page_id) {
-                            Button (action: {
-                                if let page = self.state.book.entity.data[page_id] {
-                                    self.state.read_page = page
-                                    self.state.read_page_id = page_id
-                                    self.state.entry = MainPage.PageDetail
-                                }
-                            }) {
-                                PageRow(page: self.state.book.get_page(id: page_id))
-                            }
+                            HStack {
+                                Button (action: {
+                                    if let page = self.state.book.entity.data[page_id] {
+                                        self.state.book.append_history(id: page_id)
+                                        self.state.read_page = page
+                                        self.state.read_page_id = page_id
+                                        self.state.entry = .PageDetail
+                                    }
+                                }) {
+                                    PageRow(page_id: page_id, page: self.state.book.get_page(id: page_id), read_page_id: self.$state.read_page_id)
+                                }.buttonStyle(BorderlessButtonStyle())
+                                .padding(.vertical, 0).padding(.trailing, -4)
+                                Button (action: {
+                                    if let page = self.state.book.entity.data[page_id] {
+                                        switch page.page_type {
+                                        case .Link:
+                                            if let url = URL(string: page.content) {
+                                                UIApplication.shared.open(url)
+                                                // _ = NSWorkspace.shared.open(url)
+                                            }
+                                        }
+                                    }
+                                }) {
+                                    PageLauncher(width: 32, height: 50, page_type: self.state.book.get_page(id: page_id).page_type)
+                                    }.buttonStyle(BorderlessButtonStyle())
+                                .padding(.vertical, 0)
+                            }.padding(.vertical, -4)
                         }
                     }
                 }
             }
+            Spacer()
         }
     }
 }

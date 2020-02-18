@@ -11,8 +11,9 @@ import CoreData
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
-
+    
+    lazy var state = MaesterState()
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         return true
@@ -30,6 +31,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the user discards a scene session.
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
+        print("stop0")
+        for ss in sceneSessions {
+            print("stop1")
+            if let scene = ss.scene, let _ = scene.delegate {
+                print("stop2")
+                // (delegate as! SceneDelegate).state.book.stop()
+            }
+        }
+        self.state.book.stop()
+        print("Application is stopping!")
     }
 
     // MARK: - Core Data stack
@@ -76,6 +87,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
     }
-
+        
 }
 

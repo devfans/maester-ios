@@ -1,0 +1,13 @@
+{
+  "info" : {
+    "version" : 1,
+    "author" : "xcode"
+  },
+  "data" : [
+    {
+      "idiom" : "universal",
+      "filename" : "Infinity-2.9s-200px.gif",
+      "universal-type-identifier" : "com.compuserve.gif"
+    }
+  ]
+}

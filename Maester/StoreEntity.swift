@@ -52,12 +52,9 @@ struct Page: Codable {
             if self.content.count > 0 && self.category.count > 0 {
                 return true
             }
-        default:
-            return false
         }
         return false
     }
-    
 }
 
 struct PageIDAction: Codable {
