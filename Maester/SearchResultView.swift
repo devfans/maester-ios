@@ -25,6 +25,7 @@ struct SearchResultView: View {
             self.state.search()
         }
         return VStack {
+            /*
             HStack {
                 Spacer()
                 HStack{
@@ -32,11 +33,8 @@ struct SearchResultView: View {
                     Text(self.state.search_keyword).foregroundColor(Color.blue)
                 }
             }.padding(.horizontal, 20)
-            Picker(selection: pi, label: Text("")) {
-                ForEach(self.search_types.indices) {
-                    Text(self.search_types[$0])
-                }
-                }.pickerStyle(SegmentedPickerStyle())
+            */
+            
             List {
                 ForEach(self.state.search_ressults, id: \.self) { page_id in
                     Group {
@@ -44,7 +42,7 @@ struct SearchResultView: View {
                             HStack {
                                 Button (action: {
                                     if let page = self.state.book.entity.data[page_id] {
-                                        self.state.book.append_history(id: page_id)
+                                        self.state.book.insert_into_history(id: page.gen_id(), page: page)
                                         self.state.read_page = page
                                         self.state.read_page_id = page_id
                                         self.state.entry = .PageDetail
@@ -73,7 +71,13 @@ struct SearchResultView: View {
                 }
             }
             Spacer()
-        }
+            Picker(selection: pi, label: Text("")) {
+                ForEach(self.search_types.indices) {
+                    Text(self.search_types[$0]).padding(.vertical, 5)
+                }
+            }.pickerStyle(SegmentedPickerStyle()).foregroundColor(Color.blue)
+        }//.padding(.top, -60)
+            .navigationBarTitle("\(self.state.search_keyword) - Found \(self.state.search_ressults.count) items", displayMode: .inline)
     }
 }
 

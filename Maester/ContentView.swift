@@ -160,8 +160,8 @@ struct ContentView: View {
             
             VStack {
                 SyncStatusView(status: self.$state.sync_status)
-                    .padding(.bottom, -28)
-                    .padding(.top, 0)
+                    .padding(.bottom, -12)
+                    .padding(.top, -16)
             }.frame(width: 30, height: 0).zIndex(100).padding(.top, 0)
             
             
@@ -169,37 +169,33 @@ struct ContentView: View {
                 TabView(selection: $selection) {
                     NavigationView {
                         List {
-                            ForEach(self.state.book.history, id: \.self) { page_id in
+                            ForEach(self.state.book.history.indices, id: \.self) { index in
                                 Group {
-                                    if self.state.book.has_page(id: page_id) {
-                                        HStack {
-                                            Button (action: {
-                                                if let page = self.state.book.entity.data[page_id] {
-                                                    self.state.read_page = page
-                                                    self.state.read_page_id = page_id
-                                                    self.state.entry = .PageDetail
-                                                    self.state.check_sync()
+                                    HStack {
+                                        Button (action: {
+                                            let page = self.state.book.history[index]
+                                            self.state.read_page = page.1
+                                            self.state.read_page_id = page.0
+                                            self.state.entry = .PageDetail
+                                            self.state.check_sync()
+                                        }) {
+                                            PageRow(page_id: self.state.book.history[index].0, page: self.state.book.history[index].1, read_page_id: self.$state.read_page_id)
+                                            }.buttonStyle(BorderlessButtonStyle())
+                                        .padding(.vertical, 0).padding(.trailing, -4)
+                                        Button (action: {
+                                            let page = self.state.book.history[index].1
+                                            switch page.page_type {
+                                            case .Link:
+                                                if let url = URL(string: page.content) {
+                                                    UIApplication.shared.open(url)
+                                                    // _ = NSWorkspace.shared.open(url)
                                                 }
-                                            }) {
-                                                PageRow(page_id: page_id, page: self.state.book.get_page(id: page_id), read_page_id: self.$state.read_page_id)
-                                                }.buttonStyle(BorderlessButtonStyle())
-                                            .padding(.vertical, 0).padding(.trailing, -4)
-                                            Button (action: {
-                                                if let page = self.state.book.entity.data[page_id] {
-                                                    switch page.page_type {
-                                                    case .Link:
-                                                        if let url = URL(string: page.content) {
-                                                            UIApplication.shared.open(url)
-                                                            // _ = NSWorkspace.shared.open(url)
-                                                        }
-                                                    }
-                                                }
-                                            }) {
-                                                PageLauncher(width: 32, height: 50, page_type: self.state.book.get_page(id: page_id).page_type)
-                                                }.buttonStyle(BorderlessButtonStyle())
-                                            .padding(.vertical, 0)
-                                        }.padding(.vertical, -4)
-                                    }
+                                            }
+                                        }) {
+                                            PageLauncher(width: 32, height: 50, page_type: self.state.book.history[index].1.page_type)
+                                            }.buttonStyle(BorderlessButtonStyle())
+                                        .padding(.vertical, 0)
+                                    }.padding(.vertical, -4)
                                 }
                             }
                         }
@@ -294,8 +290,8 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         let state = MaesterState()
         state.sync(force: true)
-        for id in state.book.entity.data.keys {
-            state.book.history.append(id)
+        for (id, page) in state.book.entity.data {
+            state.book.insert_into_history(id: id, page: page)
         }
         return ContentView()
         .environmentObject(state)

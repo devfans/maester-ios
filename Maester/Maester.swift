@@ -96,7 +96,7 @@ class MaesterBook {
     
     let server = Server.shared
     var entity = StoreEntity()
-    var history = [String]()
+    var history = [(String, Page)]()
     var tags = [String: Int]()
     var categories = [String: Int]()
     var sync_status = SyncStatus.Out
@@ -185,23 +185,25 @@ class MaesterBook {
         return Array(suggestions.prefix(3))
     }
     
-    public func append_history(id: String) {
-        if let index = self.history.firstIndex(of: id) {
-            self.history.remove(at: index)
-        }
-        self.history.insert(id, at: 0)
+    public func insert_into_history(id: String, page: Page) {
+        self.remove_from_history(id: id)
+        self.history.insert((id, page), at: 0)
+        
         if self.history.count > 100 {
             _ = self.history.popLast()
         }
     }
     
+    public func remove_from_history(id: String) {
+        self.history.removeAll(where: { $0.0 == id })
+    }
+    
+    
     public func apply_action(action: PageAction, queue: Bool = true, cache: Bool = true) -> Bool {
-        var id: String?
         if case PageAction.Put(_, let page) = action {
             if !page.is_valid() {
                 return false
             }
-            id = page.gen_id()
             if self.categories.keys.contains(page.category) {
                 self.categories[page.category]! += 1
             } else {
@@ -215,12 +217,14 @@ class MaesterBook {
                     self.tags[tag] = 1
                 }
             }
+            if queue {
+                self.insert_into_history(id: page.gen_id(), page: page)
+            }
+        } else if case PageAction.Delete(let id) = action {
+            self.remove_from_history(id: id)
         }
         if queue {
             self.actions.append(action)
-            if let page_id = id {
-                self.append_history(id: page_id)
-            }
             if cache {
                 self.actions_cache.append(action)
             }
@@ -273,9 +277,10 @@ class MaesterBook {
                 _ = self.apply_action(action: action, queue: false, cache: false)
             }
             // For debug
-            for id in self.entity.data.keys {
-                self.append_history(id: id)
-            }
+            /*
+            for (id, page)) in self.entity.data {
+                self.insert_into_history(id: id, page: page)
+            }*/
         } else {
             self.entity.time = message.time
         }
@@ -326,7 +331,12 @@ class MaesterBook {
     
     private func apply_local_store(store: LocalStore) {
         self.entity = store.entity
-        self.history = store.history
+        self.history.removeAll()
+        for key in store.history {
+            if let page = self.entity.data[key] {
+                self.insert_into_history(id: key, page: page)
+            }
+        }
         if store.queue.count > 0 {
             self.entity.apply_actions(actions: store.queue)
             self.actions = store.queue + self.actions
@@ -368,7 +378,7 @@ class MaesterBook {
                 for action in json_actions.actions {
                     _ = self.apply_action(action: action, queue: false)
                     if case PageAction.Put(_, let page) = action {
-                        self.append_history(id: page.gen_id())
+                        self.insert_into_history(id: page.gen_id(), page: page)
                     }
                 }
                 print("Loaded and applied page actions from local data")
@@ -378,7 +388,7 @@ class MaesterBook {
         // Re save file_start
         let data = try! self.encoder.encode(LocalStore(
             entity: self.entity,
-            history: Array(self.history.prefix(50)),
+            history: self.history.prefix(50).map { id, _ in id }.reversed(),
             queue: self.actions
         ))
         if self.save_file(file: "\(path)/\(MaesterConstants.file_start)", data: data) {
@@ -415,7 +425,7 @@ class MaesterBook {
         
         let data = try! self.encoder.encode(LocalStore(
             entity: self.entity,
-            history: Array(self.history.prefix(50)),
+            history: self.history.prefix(50).map {id, _ in id}.reversed(),
             queue: self.actions
         ))
         
