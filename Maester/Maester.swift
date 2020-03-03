@@ -287,6 +287,14 @@ class MaesterBook {
         
         if message.actions.count > 0 {
             self.entity.apply_actions(actions: message.actions)
+            for action in message.actions {
+                if case PageAction.Put(_, let page) = action {
+                    let page_id = page.gen_id()
+                    if !self.history.contains(where: {id, _ in id == page_id}) {
+                        self.insert_into_history(id: page_id, page: page)
+                    }
+                }
+            }
         }
         
         for (k, v) in self.entity.data {
