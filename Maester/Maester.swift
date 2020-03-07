@@ -20,6 +20,10 @@ struct LocalStoreActions: Codable {
     var actions: [PageAction]
 }
 
+struct LocalLogin: Codable {
+    var token: String
+}
+
 struct MaesterConstants {
     static let backgroundColor = Color(red: 19.0/255.0, green: 13.0/255.0, blue: 24.0/255.0, opacity: 0.3)
     static let lightBackgroundColor = Color(red: 189.0/255.0, green: 183.0/255.0, blue: 184.0/255.0, opacity: 0.3)
@@ -28,6 +32,7 @@ struct MaesterConstants {
     static let file_end = "maester_data_end.json"
     static let file_actions = "maester_data_actions.json"
     static let app_group = "group.io.devfans.maester"
+    static let file_login = "maester_login.json"
     static let local_only = false
 }
 
@@ -51,6 +56,7 @@ enum SyncStatus: String {
     case In
     case Out
     case On
+    case Login
 }
 
 class MaesterState: ObservableObject {
@@ -63,12 +69,17 @@ class MaesterState: ObservableObject {
     @Published var search_type = 3
     @Published var search_keyword = ""
     @Published var search_ressults = [String]()
-    @Published var sync_status = SyncStatus.On
+    @Published var sync_status = SyncStatus.Login
     @Published var selected_page_id = ""
+    @Published var user = "Local"
+    @Published var show_new_page = false
+    @Published var show_page_detail = false
+    
     
     public func sync(force: Bool = false) {
         let before = self.sync_status
         self.sync_status = .On
+        
         self.book.update(force) { status in
             if let after = status {
                 self.sync_status = after
@@ -89,6 +100,22 @@ class MaesterState: ObservableObject {
         self.search_ressults = self.book.search(self.search_keyword, self.search_type)
         self.check_sync()
     }
+    
+    public func login(_ user: String, _ pass: String, handle: @escaping (SyncStatus?) -> Void) {
+        self.book.login(user, pass) { res in
+            if let status = res, status == .In {
+                self.sync_status = .In
+            }
+            handle(res)
+            self.user =  self.book.get_user(user: "Local")
+        }
+    }
+    
+    public func logout() {
+        self.book.logout()
+        self.sync_status = .Login
+
+    }
 }
 
 class MaesterBook {
@@ -104,7 +131,10 @@ class MaesterBook {
     var actions = [PageAction]()
     var actions_cache = [PageAction]()
     
-    var id = [UInt8].init(repeating: 0, count: 32)
+    // var id = [UInt8].init(repeating: 0, count: 32)
+    
+    var jwt_token: JwtToken? = nil
+    private var loaded = false
     
     private let decoder = JSONDecoder()
     private let encoder = JSONEncoder()
@@ -200,7 +230,7 @@ class MaesterBook {
     
     
     public func apply_action(action: PageAction, queue: Bool = true, cache: Bool = true) -> Bool {
-        if case PageAction.Put(_, let page) = action {
+        if case PageAction.Put(let id, let page) = action {
             if !page.is_valid() {
                 return false
             }
@@ -218,10 +248,12 @@ class MaesterBook {
                 }
             }
             if queue {
+                self.remove_from_history(id: id)
                 self.insert_into_history(id: page.gen_id(), page: page)
             }
         } else if case PageAction.Delete(let id) = action {
             self.remove_from_history(id: id)
+            
         }
         if queue {
             self.actions.append(action)
@@ -231,6 +263,75 @@ class MaesterBook {
         }
         self.entity.apply_actions(actions: [action])
         return true
+    }
+    
+    func update_token(_ message: Message) {
+        if case Info.Token(let token) = message.info {
+            let new_token = JwtToken(in_token: token)
+            var switch_profile = false
+            if let old_token = self.jwt_token {
+                if old_token.id != new_token.id {
+                    print("Account changed, archiving profile.")
+                    self.save_as_profile(old_token, true)
+                    switch_profile = true
+                }
+            } else {
+                print("Adding login token of user \(new_token.user)")
+                switch_profile = true
+            }
+            print("Updating token with data \(token)")
+            self.jwt_token = new_token
+            
+            if switch_profile {
+                self.unload()
+                print("Loading profile \(new_token.user)")
+                let profile = Profile(in_token: new_token)
+                self.load_profile(profile)
+                profile.save_login()
+            }
+        }
+    }
+    
+    public func login(_ user: String, _ pass: String, handle: @escaping (SyncStatus?) -> Void) {
+        if MaesterConstants.local_only {
+            handle(nil)
+            return
+        }
+        var message = Message(in_time: self.entity.time, in_actions: [])
+        message.info = Info.Login(user, pass)
+        self.server.post(message: message) { res in
+            DispatchQueue.main.sync {
+                switch res {
+                case .success(let resp_message):
+                    self.update_token(resp_message)
+                    handle(.In)
+                case .failure(let error):
+                    print("Server post error \(error)")
+                    if case Server.ServerError.InvalidCredential = error {
+                        handle(.Login)
+                    } else {
+                        handle(.Out)
+                    }
+                }
+            }
+        }
+    }
+    
+    public func logout() {
+        print("logging out now")
+        if MaesterConstants.local_only {
+            return
+        }
+        
+        let current_token = self.jwt_token
+        if let token = current_token {
+            self.save_as_profile(token)
+        }
+        
+        self.unload()
+        self.sync_status = .Login
+        let profile = Profile(in_token: nil)
+        profile.remove_login()
     }
     
     public func update(_ force: Bool = false, handle: @escaping (SyncStatus?) -> Void) {
@@ -243,24 +344,34 @@ class MaesterBook {
             handle(nil)
             return
         }*/
-        print("Synchronizing...")
-        self.last_sync = Date()
-        let temp_actions = self.actions
-        self.actions.removeAll()
-        var message = Message(in_time: self.entity.time, in_actions: temp_actions)
-        message.info = Info.Token(self.id)
-        self.server.post(message: message) { res in
-            DispatchQueue.main.sync {
-            switch res {
-                case .success(let resp_message):
-                    self.apply_update(resp_message, temp_actions)
-                    handle(.In)
-                case .failure(let error):
-                    self.actions = temp_actions + self.actions
-                    print(error)
-                    handle(.Out)
+        if let token = self.jwt_token {
+            print("Synchronizing...")
+            self.last_sync = Date()
+            let temp_actions = self.actions
+            self.actions.removeAll()
+            var message = Message(in_time: self.entity.time, in_actions: temp_actions)
+            message.info = Info.Token(token.token)
+            self.server.post(message: message) { res in
+                DispatchQueue.main.sync {
+                switch res {
+                    case .success(let resp_message):
+                        self.update_token(resp_message)
+                        self.apply_update(resp_message, temp_actions)
+                        handle(.In)
+                    case .failure(let error):
+                        self.actions = temp_actions + self.actions
+                        print(error)
+                        if case Server.ServerError.InvalidCredential = error {
+                            handle(.Login)
+                        } else {
+                            handle(.Out)
+                        }
+                    }
                 }
             }
+        } else {
+            print("Update canceled for invalid token found!")
+            handle(.Login)
         }
     }
     
@@ -293,6 +404,8 @@ class MaesterBook {
                     if !self.history.contains(where: {id, _ in id == page_id}) {
                         self.insert_into_history(id: page_id, page: page)
                     }
+                } else if case PageAction.Delete(let id) = action {
+                    self.remove_from_history(id: id)
                 }
             }
         }
@@ -303,8 +416,35 @@ class MaesterBook {
     }
     
     public func start(_ init_handler: @escaping (SyncStatus) -> Void) {
+        if self.loaded {
+            return
+        } else {
+            self.loaded = true
+        }
+        
         // self.clear_local_data()
-        self.load_data(init_handler)
+        let profile = Profile(in_token: nil)
+        profile.prepare()
+        
+        if profile.load_login() {
+            self.jwt_token = profile.jwt_token
+            self.load_profile(profile)
+            
+            self.update(true) { res in
+                if let status = res, status == .In {
+                    print("Successfully synced for initial state")
+                    self.sync_status = .In
+                } else {
+                    print("Failed to sync for initial state")
+                    self.sync_status = .Out
+                }
+                init_handler(self.sync_status)
+            }
+            
+        } else if MaesterConstants.local_only {
+            self.jwt_token = nil
+            self.load_profile(profile)
+        }
     }
     
     public func stop() {
@@ -312,29 +452,34 @@ class MaesterBook {
         let group = DispatchGroup()
         group.enter()
         if !MaesterConstants.local_only && self.actions.count > 0 {
-            print("Synchronizing...")
-            self.last_sync = Date()
-            let temp_actions = self.actions
-            self.actions.removeAll()
-            var message = Message(in_time: self.entity.time, in_actions: temp_actions)
-            message.info = Info.Token(self.id)
-            self.server.post(message: message) { res in
-                switch res {
-                    case .success(let resp_message):
-                        self.apply_update(resp_message, temp_actions)
-                        print("Successfully graceful shutdown!")
-                    case .failure(let error):
-                        self.actions = temp_actions + self.actions
-                        print(error)
-                        print("Failed graceful shutdown!")
+            if let token = self.jwt_token {
+                print("Synchronizing...")
+                self.last_sync = Date()
+                let temp_actions = self.actions
+                self.actions.removeAll()
+                var message = Message(in_time: self.entity.time, in_actions: temp_actions)
+                message.info = Info.Token(token.token)
+                self.server.post(message: message) { res in
+                    switch res {
+                        case .success(let resp_message):
+                            self.apply_update(resp_message, temp_actions)
+                            print("Successfully graceful shutdown!")
+                        case .failure(let error):
+                            self.actions = temp_actions + self.actions
+                            print(error)
+                            print("Failed graceful shutdown!")
+                    }
+                    group.leave()
                 }
+            } else {
+                print("Skipped synch on stop for invalid token found!")
                 group.leave()
             }
         } else {
             group.leave()
         }
         group.wait()
-        self.save_data()
+        self.save_as_profile(self.jwt_token)
     }
     
     private func apply_local_store(store: LocalStore) {
@@ -352,27 +497,46 @@ class MaesterBook {
         }
     }
     
-    private func load_data(_ init_handler: @escaping (SyncStatus) -> Void) {
+    private func clear_local_data() {
         let path = self.get_data_root()
-        self.should_have_dir(dir: path)
-        // Cases
-        // 1: Load file_end data
-        // 2: 1 fail: Load file_start data and try re-apply actions data
-        // 3: 1 and 2 fail: try re-apply actions data only
-        var entity_loaded = false
-        var load_actions = false
-        if let json_end: LocalStore = self.load_json(file: "\(path)/\(MaesterConstants.file_end)") {
-            self.apply_local_store(store: json_end)
-            entity_loaded = true
-        } else {
-            if let json_start: LocalStore = self.load_json(file: "\(path)/\(MaesterConstants.file_start)") {
-                self.apply_local_store(store: json_start)
-                entity_loaded = true
-            }
-            load_actions = true
-        }
+        try? FileManager.default.removeItem(atPath: path)
+    }
+    
+    private func get_data_root() -> String {
+        let app_dir = "\(NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first!)/data"
+        // let app_dir2 = "\(FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: MaesterConstants.app_group)!.path)/data"
+        return app_dir
         
-        if entity_loaded {
+    }
+    
+    private func unload() {
+        print("Clearing current profile")
+        self.entity = StoreEntity()
+        self.tags = .init()
+        self.categories = .init()
+        self.actions = []
+        self.actions_cache = []
+        self.history = []
+        self.sync_status = .On
+        self.last_sync = Date()
+    }
+    
+    func save_as_profile(_ profile_token: JwtToken?, _ async: Bool = false) {
+        let profile = Profile(in_token: profile_token)
+        profile.local_store = LocalStore(
+            entity: self.entity,
+            history: self.history.prefix(50).map {id, _ in id}.reversed(),
+            queue: self.actions
+        )
+        
+        profile.local_actions = LocalStoreActions(actions: self.actions_cache)
+        profile.save()
+    }
+    
+    func load_profile(_ profile: Profile) {
+        let res = profile.load_data()
+        if res.entity_loaded {
+            self.apply_local_store(store: profile.local_store)
             let index = self.entity.gen_index()
             self.tags = index.tags
             self.categories = index.categories
@@ -381,9 +545,9 @@ class MaesterBook {
             print("Failed to load local entity")
         }
         
-        if load_actions {
-            if let json_actions: LocalStoreActions = self.load_json(file: "\(path)/\(MaesterConstants.file_actions)") {
-                for action in json_actions.actions {
+        if res.load_actions {
+            if profile.load_actions() {
+                for action in profile.local_actions.actions {
                     _ = self.apply_action(action: action, queue: false)
                     if case PageAction.Put(_, let page) = action {
                         self.insert_into_history(id: page.gen_id(), page: page)
@@ -393,78 +557,87 @@ class MaesterBook {
             }
         }
         
-        // Re save file_start
-        let data = try! self.encoder.encode(LocalStore(
+        profile.local_store = LocalStore(
             entity: self.entity,
             history: self.history.prefix(50).map { id, _ in id }.reversed(),
             queue: self.actions
-        ))
-        if self.save_file(file: "\(path)/\(MaesterConstants.file_start)", data: data) {
-            print("Successfully saved start data")
-        } else {
-            print("Failed to save start data")
-        }
+        )
         
-        self.update(true) { res in
-            if let status = res, status == .In {
-                print("Successfully synced for initial state")
-                self.sync_status = .In
+        profile.resave_data()
+    }
+            
+    public func get_user(_ in_token: JwtToken? = nil, user: String = "") -> String {
+        if let token = in_token ?? self.jwt_token {
+            return token.user
+        }
+        return user
+    }
+}
+
+class Profile {
+    var jwt_token: JwtToken?
+    let app_dir: String
+    var local_store: LocalStore
+    var local_actions: LocalStoreActions
+    
+    let encoder = JSONEncoder()
+    let decoder = JSONDecoder()
+    
+    var login_dir: String {
+        get {
+            "\(self.app_dir)/\(MaesterConstants.file_login)"
+        }
+    }
+    
+    init(in_token: JwtToken?) {
+        jwt_token = in_token
+        self.app_dir = "\(NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first!)/data"
+        local_store = LocalStore ( entity: StoreEntity(), history: [], queue: [] )
+        local_actions = LocalStoreActions ( actions: [] )
+    }
+    
+    private func format_file_name(_ file: String, _ in_token: JwtToken? = nil) -> String {
+        var user = ""
+        let token = in_token == nil ? self.jwt_token : in_token;
+        if let login = token, login.id.count > 0 {
+            user = "user-\(login.id)."
+        }
+        return "\(self.app_dir)/\(user)\(file)"
+    }
+    
+    public func save_login() {
+        if let token = self.jwt_token {
+            let data = try! self.encoder.encode(LocalLogin(
+                token: token.token
+            ))
+            if self.save_file(file: self.login_dir, data: data) {
+                print("Successfully saved login for user \(token.user)")
             } else {
-                print("Failed to sync for initial state")
-                self.sync_status = .Out
-            }
-            init_handler(self.sync_status)
-        }
-    }
-    
-    private func load_json<T: Codable>(file: String) -> T? {
-        if let data = self.load_file(file: file) {
-            if let json = try? self.decoder.decode(T.self, from: data) {
-                return json
+                print("Failed to save login locally for user \(token.user)")
             }
         }
-        return nil
     }
     
-    private func save_data() {
-        // Save file_end
-        let path = self.get_data_root()
-        self.should_have_dir(dir: path)
-        
-        let data = try! self.encoder.encode(LocalStore(
-            entity: self.entity,
-            history: self.history.prefix(50).map {id, _ in id}.reversed(),
-            queue: self.actions
-        ))
-        
-        if self.save_file(file: "\(path)/\(MaesterConstants.file_end)", data: data) {
-            print("Successfully saved end data")
+    public func load_login() -> Bool {
+        print("Loading local login")
+        if let json_login: LocalLogin = self.load_json(file: self.login_dir) {
+            self.jwt_token = JwtToken(in_token: json_login.token)
+            print("Successfully loaded local login with account: \(self.jwt_token!.user)")
+            return true
         } else {
-            print("Failed to save end data")
+            print("Didnt find valid local login!")
         }
-        
-        self.save_actions()
+        return false
     }
     
-    private func save_actions () {
-        let path = self.get_data_root()
-        self.should_have_dir(dir: path)
-        // Save actions file
-        
-        let data = try! self.encoder.encode(LocalStoreActions(
-            actions: self.actions_cache
-        ))
-        if self.save_file(file: "\(path)/\(MaesterConstants.file_actions)", data: data) {
-            print("Successfully saved actions data")
-        } else {
-            print("Failed to save actions data")
-        }
+    public func remove_login() {
+        try? FileManager.default.removeItem(atPath: self.login_dir)
     }
     
-    private func clear_local_data() {
-        let path = self.get_data_root()
-        try? FileManager.default.removeItem(atPath: path)
+    public func prepare() {
+        self.should_have_dir(dir: self.app_dir)
     }
+    
     
     private func should_have_dir(dir: String) {
         try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true, attributes: nil)
@@ -488,197 +661,82 @@ class MaesterBook {
         return false
     }
     
-    private func get_data_root() -> String {
-        let app_dir = "\(NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first!)/data"
-        // let app_dir2 = "\(FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: MaesterConstants.app_group)!.path)/data"
-        return app_dir
+    public func save() {
+        var user = "Local"
+        if let token = self.jwt_token {
+            user = token.user
+        }
+        print("Saving profile for user \(user)")
+        self.save_data()
+        print("Finished saving profile for user \(user)")
+    }
+    
+    private func save_data() {
+        let data = try! self.encoder.encode(self.local_store)
         
-    }
-}
-
-/*
-
-enum MainPage: Int {
-    case Main
-    case AddPage
-    case PageDetail
-    case EditPage
-}
-
-enum SearchType: String {
-    case Category
-    case Tag
-    case Keyword
-}
-
-class MaesterState: ObservableObject {
-    @Published var book = MaesterBook.shared
-    @Published var entry = MainPage.Main
-    @Published var new_page_data = [String: String]()
-    @Published var read_page = Page(withLink: "")
-    @Published var read_page_id = ""
-    @Published var write_page = Page(withLink: "")
-    @Published var search_type = SearchType.Keyword
-    @Published var search_keyword = ""
-}
-
-class MaesterBook {
-    public static let shared = MaesterBook()
-    
-    let server = Server.shared
-    var entity = StoreEntity()
-    var history = [String]()
-    var tags = [String: Int]()
-    var categories = [String: Int]()
-    
-    var actions = [PageAction]()
-    
-    var id = [UInt8].init(repeating: 0, count: 32)
-    
-    public func has_page(id: String) -> Bool {
-        return self.entity.data.keys.contains(id)
-    }
-    
-    init() {
-        self.update(true)
-        
-    }
-    
-    public func search(_ keyword: String, _ search_type: SearchType) -> [String] {
-        switch search_type {
-        case .Category:
-            return Array(self.search_by_category(keyword).keys)
-        case .Tag:
-            return Array(self.search_by_tag(keyword).keys)
-        case .Keyword:
-            return Array(self.search_by_name(keyword).keys)
-        }
-    }
-    
-    public func search_by_tag(_ in_tag: String) -> [String: Page] {
-        return self.entity.data.filter { id, page in
-            page.tags.contains(in_tag)
-        }
-    }
-    
-    public func search_by_category(_ in_category: String) -> [String: Page] {
-        return self.entity.data.filter { id, page in
-            page.category == in_category
-        }
-    }
-    
-    public func search_by_name(_ in_name: String) -> [String: Page] {
-        return self.entity.data.filter { id, page in
-            page.name.contains(in_name)
-        }
-    }
-    
-    public func get_page(id: String) -> Page {
-        if let page = self.entity.data[id] {
-            return page
-        }
-        return Page(withLink: "")
-    }
-    
-    public static func suggest(index: [String: Int], value: String) -> [String]  {
-        if value.count < 1 {
-            return [String]()
-        }
-        let v = value.lowercased()
-        var suggestions = index.keys.filter { key in
-            key.lowercased().contains(v)
-        }
-        suggestions.sort()
-        return Array(suggestions.prefix(3))
-    }
-    
-    public func append_history(id: String) {
-        if let index = self.history.firstIndex(of: id) {
-            self.history.remove(at: index)
-        }
-        self.history.insert(id, at: 0)
-        if self.history.count > 100 {
-            _ = self.history.popLast()
-        }
-    }
-    
-    public func apply_action(action: PageAction, queue: Bool = true) -> Bool {
-        var id: String?
-        if case PageAction.Put(_, let page) = action {
-            if !page.is_valid() {
-                return false
-            }
-            id = page.gen_id()
-            if self.categories.keys.contains(page.category) {
-                self.categories[page.category]! += 1
-            } else {
-                self.categories[page.category] = 1
-            }
-            
-            for tag in page.tags {
-                if self.tags.keys.contains(tag)  {
-                    self.tags[tag]! += 1
-                } else {
-                    self.tags[tag] = 1
-                }
-            }
-        }
-        if queue {
-            self.actions.append(action)
-            if let page_id = id {
-                self.append_history(id: page_id)
-            }
-        }
-        self.entity.apply_actions(actions: [action])
-        return true
-    }
-    
-    public func update(_ force: Bool = false) {
-        if !force && self.actions.count == 0 {
-            return
-        }
-        let temp_actions = self.actions
-        self.actions.removeAll()
-        var message = Message(in_time: self.entity.time, in_actions: temp_actions)
-        message.info = Info.Token(self.id)
-        self.server.post(message: message) { res in
-            switch res {
-            case .success(let resp_message):
-                self.apply_update(resp_message, temp_actions)
-            case .failure(let error):
-                self.actions = temp_actions + self.actions
-                print(error)
-            }
-        }
-    }
-    
-    func apply_update(_ message: Message, _ actions: [PageAction]) {
-        // Update token
-        // Check entity
-        // Apply actions
-        if case let StoreData.Data(entity) = message.body {
-            self.entity = entity
-            let index = self.entity.gen_index()
-            self.tags = index.tags
-            self.categories = index.categories
-            for action in actions {
-                _ = self.apply_action(action: action, queue: false)
-            }
-            // For debug
-            for id in self.entity.data.keys {
-                self.append_history(id: id)
-            }
+        if self.save_file(file: self.format_file_name(MaesterConstants.file_end), data: data) {
+            print("Successfully saved end data")
         } else {
-            self.entity.time = message.time
+            print("Failed to save end data")
         }
         
-        if message.actions.count > 0 {
-            self.entity.apply_actions(actions: message.actions)
-        }
+        self.save_actions()
+    }
+    
+    private func save_actions () {
+        let data = try! self.encoder.encode(self.local_actions)
         
-        for (k, v) in self.entity.data {
-            print("entry: \(k) : \(v.content)")
+        if self.save_file(file: self.format_file_name(MaesterConstants.file_actions), data: data) {
+            print("Successfully saved actions data")
+        } else {
+            print("Failed to save actions data")
         }
     }
+    
+    public func load_data() -> (entity_loaded: Bool, load_actions: Bool){
+        // Cases
+        // 1: Load file_end data
+        // 2: 1 fail: Load file_start data and try re-apply actions data
+        // 3: 1 and 2 fail: try re-apply actions data only
+        
+        if let json_end: LocalStore = self.load_json(file: self.format_file_name(MaesterConstants.file_end)) {
+            self.local_store = json_end
+            return (true, false)
+        }
+        
+        if let json_start: LocalStore = self.load_json(file: self.format_file_name(MaesterConstants.file_start)) {
+            self.local_store = json_start
+            return (true, true)
+        }
+        
+        return (false, true)
+    }
+    
+    public func load_actions() -> Bool {
+        if let json_actions: LocalStoreActions = self.load_json(file: self.format_file_name(MaesterConstants.file_actions)) {
+            self.local_actions = json_actions
+            return true
+        }
+        return false
+    }
+    
+    public func resave_data() {
+        // Re save file_start
+        let data = try! self.encoder.encode(self.local_store)
+        if self.save_file(file: self.format_file_name(MaesterConstants.file_start), data: data) {
+            print("Successfully saved start data")
+        } else {
+            print("Failed to save start data")
+        }
+    }
+    
+    private func load_json<T: Codable>(file: String) -> T? {
+        // print("Reading json file \(file)")
+        if let data = self.load_file(file: file) {
+            if let json = try? self.decoder.decode(T.self, from: data) {
+                return json
+            }
+        }
+        return nil
+    }
 }
-*/

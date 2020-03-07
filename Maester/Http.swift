@@ -11,7 +11,8 @@ import Foundation
 
 class Server {
     public static let shared = Server()
-    private let url = URL(string: "https://maester.livefeed.cn")!
+    private let _url = URL(string: "https://maester.livefeed.cn")!
+    private let url = URL(string: "http://127.0.0.1:2000")!
     private let id = [UInt8].init(repeating: 0, count: 32)
     
     init() {

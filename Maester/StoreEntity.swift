@@ -195,7 +195,7 @@ struct StoreEntity: Codable {
 }
 
 enum Info {
-    case Token([UInt8])
+    case Token(String)
     case Login(String, String)
     case Null
 }
@@ -209,7 +209,7 @@ extension Info: Codable {
     }
     
     enum TokenCodingKeys: CodingKey {
-        case id
+        case token
     }
     
     enum LoginCodingKeys: CodingKey  {
@@ -219,10 +219,10 @@ extension Info: Codable {
     
     func encode(to encoder: Encoder) throws {
         switch self {
-        case .Token(let id):
+        case .Token(let token):
             var container = encoder.container(keyedBy: CodingKeys.self)
             var sub = container.nestedContainer(keyedBy: TokenCodingKeys.self, forKey: .Token)
-            try sub.encode(id, forKey: .id)
+            try sub.encode(token, forKey: .token)
         case .Login(let user, let pass):
             var container = encoder.container(keyedBy: CodingKeys.self)
             var sub = container.nestedContainer(keyedBy: LoginCodingKeys.self, forKey: .Login)
@@ -252,7 +252,7 @@ extension Info: Codable {
         case .Token:
             if let sub = try? container.nestedContainer(keyedBy: TokenCodingKeys.self, forKey: .Token) {
                 self = .Token(
-                    try sub.decode([UInt8].self, forKey: .id)
+                    try sub.decode(String.self, forKey: .token)
                 )
                 return
             }
@@ -339,5 +339,30 @@ struct Message: Codable {
         actions = in_actions
         info = Info.Null
         body = StoreData.Null
+    }
+}
+
+struct JwtToken {
+    var token: String
+    var user: String = ""
+    var id: String = ""
+    
+    init(in_token: String) {
+        token = in_token
+        let strs = token.split(separator: ".")
+        if (strs.count == 3) {
+            let body = String(strs[1])
+            let padded_body = body.padding(toLength: ((body.count+3)/4)*4, withPad: "=", startingAt: 0)
+            if let data = Data(base64Encoded: padded_body) {
+                let obj = try? JSONSerialization.jsonObject(with: data, options: [])
+                if let dict = obj as? [String: Any] {
+                    if let user_name = dict["usr"] as? String {
+                        user = user_name
+                        id = sha256_str(str: user)
+                    }
+                }
+            }
+        }
+        
     }
 }

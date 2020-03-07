@@ -60,6 +60,7 @@ struct InputSuggestion: View {
 
 struct NewPageView: View {
     @EnvironmentObject var state: MaesterState
+    // @Environment(\.presentationMode) var presentationMode
     @State var new_tag = ""
     var page_id: String
     // private var back: MainPage
@@ -112,7 +113,7 @@ struct NewPageView: View {
                             Text("Add")
                                 .padding(.horizontal, 20)
                                 .padding(.vertical, 15)
-                                .background(Color(red: 89.0/255.0, green: 143.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                                .background(Color.black)
 
                         }
                         .cornerRadius(2)
@@ -124,11 +125,17 @@ struct NewPageView: View {
                 Spacer()
                 Button(action: {
                     let action = PageAction.Put(self.page_id, self.state.write_page)
+                    self.state.read_page = self.state.write_page
+                    self.state.read_page_id = self.state.write_page.gen_id()
+                    
                     _ = self.state.book.apply_action(action: action)
                     self.state.sync()
-                    NSLog("Added new page")
-                    self.state.entry = .Main
+                    print("Added new page")
+                    // self.state.entry = .Main
                     self.state.new_page_data = [:]
+                    // self.presentationMode.wrappedValue.dismiss()
+                    self.state.show_new_page = false
+                    self.state.search()
                 }) {
                     HStack {
                         Spacer()
@@ -138,14 +145,33 @@ struct NewPageView: View {
                             .padding(.vertical, 10.0)
                         Spacer()
                     }
-                    .background(self.state.write_page.is_valid() ? Color.red : Color.gray)
+                    .background(self.state.write_page.is_valid() ? Color.blue : Color.gray)
                     .cornerRadius(2)
                     .padding(.vertical, 10.0)
                     .padding(.horizontal, 0)
                 }
-                .padding(.vertical, 10.0)
+                .padding(.vertical, 5)
                 .padding(.horizontal, 15.0)
                 .disabled(!self.state.write_page.is_valid())
+                Button(action: {
+                    // self.presentationMode.wrappedValue.dismiss()
+                    self.state.show_new_page = false
+                }) {
+                    HStack {
+                        Spacer()
+                        Text("Cancel")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding(.vertical, 10.0)
+                        Spacer()
+                    }
+                    .background(Color.blue)
+                    .cornerRadius(2)
+                    .padding(.vertical, 10.0)
+                    .padding(.horizontal, 0)
+                }
+                .padding(.vertical, 5)
+                .padding(.horizontal, 15.0)
                 Spacer()
             }
             .padding(.top, 10)

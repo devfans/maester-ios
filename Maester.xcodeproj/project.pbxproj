@@ -27,6 +27,9 @@
 		F859269223EDDC61001EDE5C /* MSE.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = F859268823EDDC61001EDE5C /* MSE.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F859269723EEB6E2001EDE5C /* NewPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F859269623EEB6E2001EDE5C /* NewPageView.swift */; };
 		F86C690723FBBC0C002A1663 /* ViewMisc.swift in Sources */ = {isa = PBXBuildFile; fileRef = F86C690623FBBC0C002A1663 /* ViewMisc.swift */; };
+		F86C690D2412BD8E002A1663 /* EntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F86C690C2412BD8E002A1663 /* EntryView.swift */; };
+		F86C690F2412BDA6002A1663 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F86C690E2412BDA6002A1663 /* LoginView.swift */; };
+		F86C69112412CFBE002A1663 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F86C69102412CFBE002A1663 /* AccountView.swift */; };
 		F894179E23EFFA0100F4A251 /* PageDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F894179D23EFFA0100F4A251 /* PageDetailView.swift */; };
 		F89417A023F023D200F4A251 /* EditPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F894179F23F023D200F4A251 /* EditPageView.swift */; };
 		F89417A223F0681100F4A251 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F89417A123F0681100F4A251 /* SearchView.swift */; };
@@ -97,6 +100,9 @@
 		F859268F23EDDC61001EDE5C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F859269623EEB6E2001EDE5C /* NewPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPageView.swift; sourceTree = "<group>"; };
 		F86C690623FBBC0C002A1663 /* ViewMisc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewMisc.swift; sourceTree = "<group>"; };
+		F86C690C2412BD8E002A1663 /* EntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryView.swift; sourceTree = "<group>"; };
+		F86C690E2412BDA6002A1663 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		F86C69102412CFBE002A1663 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
 		F894179D23EFFA0100F4A251 /* PageDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageDetailView.swift; sourceTree = "<group>"; };
 		F894179F23F023D200F4A251 /* EditPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPageView.swift; sourceTree = "<group>"; };
 		F89417A123F0681100F4A251 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
@@ -163,6 +169,9 @@
 				F859266523E9673B001EDE5C /* Maester.entitlements */,
 				F859261623E7E5B5001EDE5C /* AppDelegate.swift */,
 				F859261823E7E5B5001EDE5C /* SceneDelegate.swift */,
+				F86C690C2412BD8E002A1663 /* EntryView.swift */,
+				F86C690E2412BDA6002A1663 /* LoginView.swift */,
+				F86C69102412CFBE002A1663 /* AccountView.swift */,
 				F859261D23E7E5B5001EDE5C /* ContentView.swift */,
 				F86C690623FBBC0C002A1663 /* ViewMisc.swift */,
 				F89417A123F0681100F4A251 /* SearchView.swift */,
@@ -383,6 +392,8 @@
 				F859261C23E7E5B5001EDE5C /* Maester.xcdatamodeld in Sources */,
 				F89417A423F0752600F4A251 /* SearchResultView.swift in Sources */,
 				F859261723E7E5B5001EDE5C /* AppDelegate.swift in Sources */,
+				F86C690F2412BDA6002A1663 /* LoginView.swift in Sources */,
+				F86C69112412CFBE002A1663 /* AccountView.swift in Sources */,
 				F859261E23E7E5B5001EDE5C /* ContentView.swift in Sources */,
 				F859265023E94A33001EDE5C /* Maester.swift in Sources */,
 				F859261923E7E5B5001EDE5C /* SceneDelegate.swift in Sources */,
@@ -391,6 +402,7 @@
 				F86C690723FBBC0C002A1663 /* ViewMisc.swift in Sources */,
 				F894179E23EFFA0100F4A251 /* PageDetailView.swift in Sources */,
 				F859269723EEB6E2001EDE5C /* NewPageView.swift in Sources */,
+				F86C690D2412BD8E002A1663 /* EntryView.swift in Sources */,
 				F859264D23E89286001EDE5C /* Http.swift in Sources */,
 				F89417A223F0681100F4A251 /* SearchView.swift in Sources */,
 			);

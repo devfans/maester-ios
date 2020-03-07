@@ -34,7 +34,7 @@ struct LabelText: View {
 
 struct PageDetailView: View {
     @EnvironmentObject var state: MaesterState
-    @Binding var main_selection: Int
+    // @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -46,7 +46,7 @@ struct PageDetailView: View {
                     self.state.search_type = SearchType.Category.rawValue
                     self.state.search_keyword = self.state.read_page.category
                     // self.state.search()
-                    self.main_selection = 0
+                    // self.main_selection = 0
                     self.state.entry = MainPage.Main
                 }) {
                     Text(self.state.read_page.category)
@@ -72,7 +72,7 @@ struct PageDetailView: View {
                             self.state.search_type = SearchType.Tag.rawValue
                             self.state.search_keyword = tag
                             // self.state.search()
-                            self.main_selection = 0
+                            // self.main_selection = 0
                             self.state.entry = MainPage.Main
                         }) {
                             Text(tag)
@@ -113,7 +113,7 @@ struct PageDetailView: View {
                             .padding(.vertical, 10)
                             .padding(.horizontal, 16)
                         .foregroundColor(Color.white)
-                        .background(Color.red)
+                        .background(Color.blue)
 
                     }.cornerRadius(6)
                 }
@@ -124,27 +124,80 @@ struct PageDetailView: View {
             LabelText(label: "Content", value: self.state.read_page.content)
             LabelText(label: "Date Created", value: String(self.state.read_page.time))
             
-                    
-            Button(action: {
-                let action = PageAction.Delete(self.state.read_page_id)
-                _ = self.state.book.apply_action(action: action)
-                self.state.sync()
-                NSLog("Deleted page")
-                
-                self.state.read_page = Page(withLink: "")
-                self.state.read_page_id = ""
-            }) {
-                Text("Delete")
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 16)
-                .foregroundColor(Color.white)
-                .background(Color.blue)
-            }.cornerRadius(6)
-                .padding(.top, 40)
-                .padding(.leading, 15)
-            
             Spacer()
-            
+            VStack {
+                Button(action: {
+                    self.state.write_page = self.state.read_page
+                    // self.state.entry = .EditPage
+                    // self.presentationMode.wrappedValue.dismiss()
+                    self.state.show_new_page = true
+                    self.state.check_sync()
+                 }) {
+                    HStack {
+                         Spacer()
+                         Text("Edit")
+                             .font(.headline)
+                             .foregroundColor(.white)
+                             .padding(.vertical, 10.0)
+                         Spacer()
+                     }
+                    .background(Color.blue)
+                     .cornerRadius(2)
+                     .padding(.vertical, 10.0)
+                     .padding(.horizontal, 0)
+                 }
+                     .padding(.vertical, 3)
+                .sheet(isPresented: self.$state.show_new_page) {
+                    EditPageView().environmentObject(self.state)
+                }
+                
+                Button(action: {
+                    let action = PageAction.Delete(self.state.read_page_id)
+                     _ = self.state.book.apply_action(action: action)
+                    self.state.sync()
+                    print("Deleted page")
+                    // self.presentationMode.wrappedValue.dismiss()
+                    self.state.show_page_detail = false
+                    self.state.read_page = Page(withLink: "")
+                    self.state.read_page_id = ""
+                    self.state.search()
+                }) {
+                   HStack {
+                        Spacer()
+                        Text("Delete")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding(.vertical, 10.0)
+                        Spacer()
+                    }
+                   .background(Color.red)
+                    .cornerRadius(2)
+                    .padding(.vertical, 10.0)
+                    .padding(.horizontal, 0)
+                }
+                    .padding(.vertical, 5)
+                
+                Button(action: {
+                    // self.presentationMode.wrappedValue.dismiss()
+                    self.state.show_page_detail = false
+                }) {
+                   HStack {
+                        Spacer()
+                        Text("Cancel")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding(.vertical, 10.0)
+                        Spacer()
+                    }
+                   .background(Color.blue)
+                    .cornerRadius(2)
+                    .padding(.vertical, 10.0)
+                    .padding(.horizontal, 0)
+                }
+                    .padding(.vertical, 5)
+                
+            }.padding(.horizontal, 10)
+               
         }.padding(.horizontal, 8)
             .padding(.top, 40)
     }
@@ -159,6 +212,6 @@ struct PageDetailView_Previews: PreviewProvider {
         page.tags = ["bing", "search"]
         page.name = "Bing"
         state.read_page = page
-        return  PageDetailView(main_selection: $main_selection).environmentObject(state)
+        return  PageDetailView().environmentObject(state)
     }
 }

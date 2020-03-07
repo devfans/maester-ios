@@ -15,6 +15,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         let state = (UIApplication.shared.delegate as! AppDelegate).state
+
+        if state.sync_status == .Login {
+            state.book.start { status in
+                print("initial sync state: \(status)")
+                state.sync_status = status
+                state.user = state.book.get_user(user: "Local")
+                // state.show_new_page = true
+            }
+        }
+                
         if let urlContext = URLContexts.first {
             let url = urlContext.url
             print(url.absoluteString)
@@ -30,7 +40,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     if let text = new_page_data["text"] {
                         state.write_page.name = text
                     }
-                    state.entry = .AddPage
+                    
+                    // state.entry = .AddPage
+                    state.show_new_page = true
                     return
                 }
             }
@@ -48,7 +60,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         print("Failed to parse data carried from share extension!")
         state.write_page = Page(withLink: "")
-        state.entry = .AddPage
+        state.show_new_page = true
+        // state.entry = .AddPage
     }
 
 
@@ -60,20 +73,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Get the managed object context from the shared persistent container.
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         let state = (UIApplication.shared.delegate as! AppDelegate).state;
+        
+        state.sync_status = MaesterConstants.local_only ? .Out : .Login
+        // state.show_new_page = false
         state.book.start { status in
             print("initial sync state: \(status)")
             state.sync_status = status
+            state.user = state.book.get_user(user: "Local")
         }
 
         // Create the SwiftUI view and set the context as the value for the managedObjectContext environment keyPath.
         // Add `@Environment(\.managedObjectContext)` in the views that will need the context.
-        let contentView = ContentView().environment(\.managedObjectContext, context).environmentObject(state)
+        let entryView = EntryView().environment(\.managedObjectContext, context).environmentObject(state)
 
         // Use a UIHostingController as window root view controller.
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)
             
-            window.rootViewController = UIHostingController(rootView: contentView)
+            window.rootViewController = UIHostingController(rootView: entryView)
             self.window = window
             window.makeKeyAndVisible()
         }

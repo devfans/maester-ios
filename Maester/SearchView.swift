@@ -87,12 +87,13 @@ struct SearchView: View {
     var body: some View {
         VStack(alignment: .leading) {
             VStack(alignment: .leading) {
+                /*
                 HStack {
                     Text("Search")
                         .font(.title)
                         .padding(.leading, 20)
                     Spacer()
-                }
+                }*/
                 HStack {
                     TextField("Search Tags, Categories, Keyword", text: $state.search_keyword)
                         .padding(.leading, 10)
@@ -144,7 +145,7 @@ struct SearchView: View {
             
             Spacer()
         }.padding(.horizontal, 15)
-        .padding(.top, 50)
+        .padding(.top, 20)
 
     }
 }

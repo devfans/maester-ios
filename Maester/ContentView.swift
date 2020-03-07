@@ -15,7 +15,8 @@ struct SyncStatusView: UIViewRepresentable {
     
     private let images = [SyncStatus.On: Self.load_gif("on_sync"),
                           SyncStatus.In: Self.load_gif("in_sync"),
-                          SyncStatus.Out: Self.load_gif("out_sync")]
+                          SyncStatus.Out: Self.load_gif("out_sync"),
+                          SyncStatus.Login: Self.load_gif("out_sync")]
         
     func makeUIView(context: UIViewRepresentableContext<SyncStatusView>) -> UIImageView {
         return Self.img_view(self.images[self.status]!)
@@ -154,6 +155,8 @@ struct PageRow_Previews: PreviewProvider {
 struct ContentView: View {
     @State private var selection = 0
     @EnvironmentObject var state: MaesterState
+    @State private var show_account = false
+    // @State private var show_page_detail = false
  
     var body: some View {
         Group {
@@ -165,75 +168,107 @@ struct ContentView: View {
             }.frame(width: 30, height: 0).zIndex(100).padding(.top, 0)
             
             
-            if self.state.entry == MainPage.Main {
-                TabView(selection: $selection) {
-                    NavigationView {
-                        List {
-                            ForEach(self.state.book.history.indices, id: \.self) { index in
-                                Group {
-                                    HStack {
-                                        Button (action: {
-                                            let page = self.state.book.history[index]
-                                            self.state.read_page = page.1
-                                            self.state.read_page_id = page.0
-                                            self.state.entry = .PageDetail
-                                            self.state.check_sync()
-                                        }) {
-                                            PageRow(page_id: self.state.book.history[index].0, page: self.state.book.history[index].1, read_page_id: self.$state.read_page_id)
-                                            }.buttonStyle(BorderlessButtonStyle())
-                                        .padding(.vertical, 0).padding(.trailing, -4)
-                                        Button (action: {
-                                            let page = self.state.book.history[index].1
-                                            switch page.page_type {
-                                            case .Link:
-                                                if let url = URL(string: page.content) {
-                                                    UIApplication.shared.open(url)
-                                                    // _ = NSWorkspace.shared.open(url)
-                                                }
+            // if self.state.entry == MainPage.Main {
+            TabView(selection: $selection) {
+                NavigationView {
+                    List {
+                        ForEach(self.state.book.history.indices, id: \.self) { index in
+                            Group {
+                                HStack {
+                                    Button (action: {
+                                        let page = self.state.book.history[index]
+                                        self.state.read_page = page.1
+                                        self.state.read_page_id = page.0
+                                        // self.state.entry = .PageDetail
+                                        self.state.show_page_detail = true
+                                        self.state.check_sync()
+                                        
+                                    }) {
+                                        PageRow(page_id: self.state.book.history[index].0, page: self.state.book.history[index].1, read_page_id: self.$state.read_page_id)
+                                        }.buttonStyle(BorderlessButtonStyle())
+                                    .padding(.vertical, 0).padding(.trailing, -4)
+                                        .sheet(isPresented: self.$state.show_page_detail) {
+                                            PageDetailView().environmentObject(self.state)
+                                    }
+                                    Button (action: {
+                                        let page = self.state.book.history[index].1
+                                        switch page.page_type {
+                                        case .Link:
+                                            if let url = URL(string: page.content) {
+                                                UIApplication.shared.open(url)
+                                                // _ = NSWorkspace.shared.open(url)
                                             }
-                                        }) {
-                                            PageLauncher(width: 32, height: 50, page_type: self.state.book.history[index].1.page_type)
-                                            }.buttonStyle(BorderlessButtonStyle())
-                                        .padding(.vertical, 0)
-                                    }.padding(.vertical, -4)
-                                }
+                                        }
+                                    }) {
+                                        PageLauncher(width: 32, height: 50, page_type: self.state.book.history[index].1.page_type)
+                                        }.buttonStyle(BorderlessButtonStyle())
+                                    .padding(.vertical, 0)
+                                }.padding(.vertical, -4)
                             }
                         }
-                        .navigationBarTitle(Text("Recent"))
-                        .navigationBarItems(trailing: Button(action: {
+                    }
+                    .navigationBarTitle(Text("Recent"))
+                    .navigationBarItems(
+                        leading: NavigationLink(destination: AccountView()) {
+                            /*Image("user").resizable().renderingMode(.template).foregroundColor(Color.blue)
+                                .aspectRatio(1, contentMode: .fit)
+                                .frame(width: 20, height: 20)*/
+                            Image(systemName: "person.crop.circle")
+                        },
+                        trailing: Button(action: {
                             self.state.write_page = Page(withLink: "")
                             self.state.new_page_data = [:]
-                            self.state.entry = .AddPage
+                            // self.state.entry = .AddPage
+                            self.state.show_new_page = true
                             self.state.check_sync()
-                        }, label: { Text("Add") }))
-                        .navigationBarHidden(false)
-                    }
-                        .tabItem {
-                            VStack {
-                                Image("recent").renderingMode(.template)
-                                Text("Recent")
-                            }
+                        }) {
+                            Image(systemName: "square.and.pencil")
+                        }.sheet(isPresented: self.$state.show_new_page) {
+                            NewPageView(page_id: "").environmentObject(self.state)
                         }
-                        .tag(1)
-                    NavigationView {
-                        SearchView()
-                        .navigationBarItems(trailing: Button(action: {
-                            self.state.write_page = Page(withLink: "")
-                            self.state.new_page_data = [:]
-                            self.state.entry = .AddPage
-                            self.state.check_sync()
-                        }, label: { Text("Add") }))
-                        .navigationBarHidden(false)
-                    }
-                        .tabItem {
-                            VStack {
-                                Image("search").renderingMode(.template)
-                                Text("Search")
-                            }
-                        }
-                        .tag(0)
+                    )
+                    .navigationBarHidden(false)
                 }
-            // } else if case .AddPage = self.state.enry {
+                    .tabItem {
+                        VStack {
+                            Image("recent").renderingMode(.template)
+                            Text("Recent")
+                        }
+                    }
+                    .tag(1)
+                NavigationView {
+                    SearchView()
+                    .navigationBarItems(
+                        leading: NavigationLink(destination: AccountView()) {
+                            /*Image("user").resizable().renderingMode(.template).foregroundColor(Color.blue)
+                                .aspectRatio(1, contentMode: .fit)
+                                .frame(width: 20, height: 20)*/
+                            Image(systemName: "person.crop.circle")
+                        },
+                        trailing: Button(action: {
+                            self.state.write_page = Page(withLink: "")
+                            self.state.new_page_data = [:]
+                            // self.state.entry = .AddPage
+                            self.state.show_new_page = true
+                            self.state.check_sync()
+                        }) {
+                            Image(systemName: "square.and.pencil")
+                        }.sheet(isPresented: self.$state.show_new_page) {
+                            NewPageView(page_id: "").environmentObject(self.state)
+                        }
+                    )
+                    .navigationBarTitle(Text("Search"))
+                    
+                }
+                    .tabItem {
+                        VStack {
+                            Image("search").renderingMode(.template)
+                            Text("Search")
+                        }
+                    }
+                    .tag(0)
+            }
+            /*
             } else if self.state.entry == MainPage.AddPage {
                 NavigationView  {
                     NewPageView(page_id: "")
@@ -254,8 +289,8 @@ struct ContentView: View {
                            .navigationBarHidden(false)
                            .navigationBarTitle(Text("Edit Page"))
                            .navigationBarItems(leading: Button(action: {
-                               self.state.entry = .PageDetail
-                            self.state.check_sync()
+                               self.state.entry = .Main
+                               self.state.check_sync()
                            })
                            {
                                Text("Cancel")
@@ -281,7 +316,7 @@ struct ContentView: View {
                             Text("Edit")
                         })
                 }
-            }
+            }*/
         }
     }
 }

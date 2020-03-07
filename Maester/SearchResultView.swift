@@ -45,12 +45,16 @@ struct SearchResultView: View {
                                         self.state.book.insert_into_history(id: page.gen_id(), page: page)
                                         self.state.read_page = page
                                         self.state.read_page_id = page_id
-                                        self.state.entry = .PageDetail
+                                        // self.state.entry = .PageDetail
+                                        self.state.show_page_detail = true
                                     }
                                 }) {
                                     PageRow(page_id: page_id, page: self.state.book.get_page(id: page_id), read_page_id: self.$state.read_page_id)
                                 }.buttonStyle(BorderlessButtonStyle())
                                 .padding(.vertical, 0).padding(.trailing, -4)
+                                    .sheet(isPresented: self.$state.show_page_detail) {
+                                        PageDetailView().environmentObject(self.state)
+                                }
                                 Button (action: {
                                     if let page = self.state.book.entity.data[page_id] {
                                         switch page.page_type {
@@ -73,7 +77,7 @@ struct SearchResultView: View {
             Spacer()
             Picker(selection: pi, label: Text("")) {
                 ForEach(self.search_types.indices) {
-                    Text(self.search_types[$0]).padding(.vertical, 5)
+                    Text(self.search_types[$0]).padding(.vertical, 5.0)
                 }
             }.pickerStyle(SegmentedPickerStyle()).foregroundColor(Color.blue)
         }//.padding(.top, -60)
