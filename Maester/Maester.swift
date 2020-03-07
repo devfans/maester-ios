@@ -324,6 +324,7 @@ class MaesterBook {
         }
         
         let current_token = self.jwt_token
+        self.jwt_token = nil
         if let token = current_token {
             self.save_as_profile(token)
         }
