@@ -27,6 +27,11 @@ struct LocalLogin: Codable {
 struct MaesterConstants {
     static let backgroundColor = Color(red: 19.0/255.0, green: 13.0/255.0, blue: 24.0/255.0, opacity: 0.3)
     static let lightBackgroundColor = Color(red: 189.0/255.0, green: 183.0/255.0, blue: 184.0/255.0, opacity: 0.3)
+    static let fieldBackground = Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0)
+    static let lightBlue = Color(red: 19.0/255.0, green: 13.0/255.0, blue: 214.0/255.0, opacity: 0.3)
+    static let faceBlue = Color(red: 39.0/255.0, green: 83.0/255.0, blue: 184.0/255.0, opacity: 0.9)
+    static let tagBackground = Color(red: 199.0/255.0, green: 213.0/255.0, blue: 244.0/255.0, opacity: 0.3)
+    static let tagForeground = Color(red: 39.0/255.0, green: 83.0/255.0, blue: 124.0/255.0, opacity: 0.8)
         
     static let file_start = "maester_data_start.json"
     static let file_end = "maester_data_end.json"
@@ -66,6 +71,7 @@ class MaesterState: ObservableObject {
     @Published var read_page = Page(withLink: "")
     @Published var read_page_id = ""
     @Published var write_page = Page(withLink: "")
+    @Published var write_page_type = 0
     @Published var search_type = 3
     @Published var search_keyword = ""
     @Published var search_ressults = [String]()
@@ -228,25 +234,33 @@ class MaesterBook {
         self.history.removeAll(where: { $0.0 == id })
     }
     
+    public func apply_page_index(_ page: Page) {
+        if !page.is_valid() {
+            return
+        }
+        if self.categories.keys.contains(page.category) {
+            self.categories[page.category]! += 1
+        } else {
+            self.categories[page.category] = 1
+        }
+        
+        for tag in page.tags {
+            if self.tags.keys.contains(tag)  {
+                self.tags[tag]! += 1
+            } else {
+                self.tags[tag] = 1
+            }
+        }
+    }
     
     public func apply_action(action: PageAction, queue: Bool = true, cache: Bool = true) -> Bool {
         if case PageAction.Put(let id, let page) = action {
             if !page.is_valid() {
                 return false
             }
-            if self.categories.keys.contains(page.category) {
-                self.categories[page.category]! += 1
-            } else {
-                self.categories[page.category] = 1
-            }
             
-            for tag in page.tags {
-                if self.tags.keys.contains(tag)  {
-                    self.tags[tag]! += 1
-                } else {
-                    self.tags[tag] = 1
-                }
-            }
+            self.apply_page_index(page)
+            
             if queue {
                 self.remove_from_history(id: id)
                 self.insert_into_history(id: page.gen_id(), page: page)
@@ -431,6 +445,7 @@ class MaesterBook {
             self.jwt_token = profile.jwt_token
             self.load_profile(profile)
             
+            init_handler(.On)
             self.update(true) { res in
                 if let status = res, status == .In {
                     print("Successfully synced for initial state")

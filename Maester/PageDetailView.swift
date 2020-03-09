@@ -26,7 +26,7 @@ struct LabelText: View {
                 Spacer()
             }
             .padding(.vertical, 1)
-            .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+            .background(MaesterConstants.fieldBackground)
                 
         }.padding(.horizontal, 10)
     }
@@ -53,7 +53,7 @@ struct PageDetailView: View {
                         .foregroundColor(Color.white)
                         .padding(.horizontal, 8.0)
                         .padding(.vertical, 2.0)
-                        .background(Color.blue)
+                        .background(MaesterConstants.faceBlue)
                 }
                 .cornerRadius(6.0)
                 .padding(.vertical, 1)
@@ -79,7 +79,7 @@ struct PageDetailView: View {
                                 .foregroundColor(Color.white)
                                 .padding(.horizontal, 8.0)
                                 .padding(.vertical, 4.0)
-                                .background(Color.blue)
+                                .background(MaesterConstants.faceBlue)
                         }.cornerRadius(6.0)
                         // .padding(.horizontal, 8)
                         // .padding(.vertical, 5)
@@ -96,11 +96,12 @@ struct PageDetailView: View {
                 HStack {
                     Text("Type")
                     .font(.headline)
+                        
                     Spacer()
                 }.padding(.vertical, 10)
                 HStack {
                     Text(self.state.read_page.page_type.rawValue)
-                        .foregroundColor(Color.blue)
+                        .foregroundColor(MaesterConstants.faceBlue)
                     .padding(.vertical, 10)
                     .padding(.horizontal, 10)
                     Spacer()
@@ -113,15 +114,33 @@ struct PageDetailView: View {
                             .padding(.vertical, 10)
                             .padding(.horizontal, 16)
                         .foregroundColor(Color.white)
-                        .background(Color.blue)
+                            .background(MaesterConstants.faceBlue)
 
                     }.cornerRadius(6)
                 }
                 .padding(.vertical, 1)
-                .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                .background(MaesterConstants.fieldBackground)
                     
             }.padding(.horizontal, 10)
-            LabelText(label: "Content", value: self.state.read_page.content)
+            // LabelText(label: "Content", value: self.state.read_page.content)
+            VStack(alignment: .leading) {
+                HStack {
+                    Text("Content")
+                    .font(.headline)
+                    Spacer()
+                }.padding(.vertical, 10)
+                GeometryReader { geo in
+                    ScrollView {
+                        Text(self.state.read_page.content)
+                            .padding(.vertical, 10).frame(width: geo.size.width, alignment: .leading)
+                        Spacer()
+                    }
+                }
+                .padding(.vertical, 1)
+                .padding(.horizontal, 3)
+                .background(MaesterConstants.fieldBackground)
+                    
+            }.padding(.horizontal, 10)
             LabelText(label: "Date Created", value: String(self.state.read_page.time))
             
             Spacer()
@@ -130,6 +149,9 @@ struct PageDetailView: View {
                     self.state.write_page = self.state.read_page
                     // self.state.entry = .EditPage
                     // self.presentationMode.wrappedValue.dismiss()
+                    if let index = [PageType.Link, PageType.Note].firstIndex(of: self.state.write_page.page_type) {
+                        self.state.write_page_type = index
+                    }
                     self.state.show_new_page = true
                     self.state.check_sync()
                  }) {
@@ -141,8 +163,8 @@ struct PageDetailView: View {
                              .padding(.vertical, 10.0)
                          Spacer()
                      }
-                    .background(Color.blue)
-                     .cornerRadius(2)
+                    .background(MaesterConstants.faceBlue)
+                     .cornerRadius(4)
                      .padding(.vertical, 10.0)
                      .padding(.horizontal, 0)
                  }
@@ -171,7 +193,7 @@ struct PageDetailView: View {
                         Spacer()
                     }
                    .background(Color.red)
-                    .cornerRadius(2)
+                    .cornerRadius(4)
                     .padding(.vertical, 10.0)
                     .padding(.horizontal, 0)
                 }
@@ -189,17 +211,17 @@ struct PageDetailView: View {
                             .padding(.vertical, 10.0)
                         Spacer()
                     }
-                   .background(Color.blue)
-                    .cornerRadius(2)
+                   .background(MaesterConstants.faceBlue)
+                    .cornerRadius(4)
                     .padding(.vertical, 10.0)
                     .padding(.horizontal, 0)
                 }
                     .padding(.vertical, 5)
                 
-            }.padding(.horizontal, 10)
+            }
                
-        }.padding(.horizontal, 8)
-            .padding(.top, 40)
+        }.padding(.horizontal, 25)
+            .padding(.top, 30)
     }
 }
 

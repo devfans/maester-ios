@@ -108,7 +108,7 @@ struct SearchView: View {
                             .padding(.vertical, 16)
                             .padding(.horizontal, 10)
                             .foregroundColor(Color.white)
-                            .background(Color.blue)
+                            .background(MaesterConstants.faceBlue)
                         }
                     }.disabled(self.state.search_keyword.count < 1)
                 }.background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
@@ -116,7 +116,7 @@ struct SearchView: View {
             VStack {
                 HStack {
                     Text("Tags")
-                        .foregroundColor(Color.blue)
+                        .foregroundColor(MaesterConstants.faceBlue)
                         .padding(.leading, 20)
                     Spacer()
                 }
@@ -131,7 +131,7 @@ struct SearchView: View {
             VStack {
                 HStack {
                     Text("Categories")
-                        .foregroundColor(Color.blue)
+                        .foregroundColor(MaesterConstants.faceBlue)
                         .padding(.leading, 20)
                     Spacer()
                 }

@@ -18,6 +18,7 @@ public func sha256_str(str: String) -> String {
 
 enum PageType: String, Codable {
     case Link
+    case Note
 }
 
 struct Page: Codable {
@@ -32,7 +33,9 @@ struct Page: Codable {
         var id = ""
         switch self.page_type {
         case .Link:
-            id = sha256_str(str: self.content)
+            id = sha256_str(str: "Maester|\(self.content)|Link")
+        case .Note:
+            id = sha256_str(str: "Maester|\(self.name)|Note")
         }
         return id
     }
@@ -48,8 +51,8 @@ struct Page: Codable {
     
     public func is_valid() -> Bool {
         switch self.page_type {
-        case .Link:
-            if self.content.count > 0 && self.category.count > 0 {
+        default:
+            if self.content.count > 0 && self.category.count > 0 && self.name.count > 0 {
                 return true
             }
         }

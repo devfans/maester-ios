@@ -81,9 +81,9 @@ struct PageLauncher: View
     
     let page_type: PageType
     
-    @State var color = Color.blue
+    @State var color = MaesterConstants.faceBlue
     
-    static let images = [PageType.Link: Image("page_link")]
+    static let images = [PageType.Link: Image("page_link"), PageType.Note: Image("page_text")]
 
     var body: some View {
         VStack {
@@ -119,6 +119,7 @@ struct PageRow: View {
                     Text(tag)
                         .font(.system(size: 12))
                         .padding(.horizontal, 4)
+                        .foregroundColor(MaesterConstants.faceBlue)
                         //.background(Color(red: 189.0/255.0, green: 183.0/255.0, blue: 184.0/255.0, opacity: 0.3))
                     .cornerRadius(5)
                 }
@@ -164,7 +165,7 @@ struct ContentView: View {
             VStack {
                 SyncStatusView(status: self.$state.sync_status)
                     .padding(.bottom, -12)
-                    .padding(.top, -16)
+                    .padding(.top, -16).foregroundColor(MaesterConstants.faceBlue)
             }.frame(width: 30, height: 0).zIndex(100).padding(.top, 0)
             
             
@@ -198,6 +199,8 @@ struct ContentView: View {
                                                 UIApplication.shared.open(url)
                                                 // _ = NSWorkspace.shared.open(url)
                                             }
+                                        case .Note:
+                                            print("A note")
                                         }
                                     }) {
                                         PageLauncher(width: 32, height: 50, page_type: self.state.book.history[index].1.page_type)
@@ -213,7 +216,7 @@ struct ContentView: View {
                             /*Image("user").resizable().renderingMode(.template).foregroundColor(Color.blue)
                                 .aspectRatio(1, contentMode: .fit)
                                 .frame(width: 20, height: 20)*/
-                            Image(systemName: "person.crop.circle")
+                            Image(systemName: "person.crop.circle").foregroundColor(MaesterConstants.faceBlue)
                         },
                         trailing: Button(action: {
                             self.state.write_page = Page(withLink: "")
@@ -222,7 +225,7 @@ struct ContentView: View {
                             self.state.show_new_page = true
                             self.state.check_sync()
                         }) {
-                            Image(systemName: "square.and.pencil")
+                            Image(systemName: "square.and.pencil").foregroundColor(MaesterConstants.faceBlue)
                         }.sheet(isPresented: self.$state.show_new_page) {
                             NewPageView(page_id: "").environmentObject(self.state)
                         }
@@ -233,7 +236,7 @@ struct ContentView: View {
                         VStack {
                             Image("recent").renderingMode(.template)
                             Text("Recent")
-                        }
+                        }.foregroundColor(MaesterConstants.faceBlue)
                     }
                     .tag(1)
                 NavigationView {
@@ -243,7 +246,7 @@ struct ContentView: View {
                             /*Image("user").resizable().renderingMode(.template).foregroundColor(Color.blue)
                                 .aspectRatio(1, contentMode: .fit)
                                 .frame(width: 20, height: 20)*/
-                            Image(systemName: "person.crop.circle")
+                            Image(systemName: "person.crop.circle").foregroundColor(MaesterConstants.faceBlue)
                         },
                         trailing: Button(action: {
                             self.state.write_page = Page(withLink: "")
@@ -252,7 +255,7 @@ struct ContentView: View {
                             self.state.show_new_page = true
                             self.state.check_sync()
                         }) {
-                            Image(systemName: "square.and.pencil")
+                            Image(systemName: "square.and.pencil").foregroundColor(MaesterConstants.faceBlue)
                         }.sheet(isPresented: self.$state.show_new_page) {
                             NewPageView(page_id: "").environmentObject(self.state)
                         }
@@ -264,7 +267,7 @@ struct ContentView: View {
                         VStack {
                             Image("search").renderingMode(.template)
                             Text("Search")
-                        }
+                        }.foregroundColor(MaesterConstants.faceBlue)
                     }
                     .tag(0)
             }

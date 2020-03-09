@@ -63,6 +63,8 @@ struct SearchResultView: View {
                                                 UIApplication.shared.open(url)
                                                 // _ = NSWorkspace.shared.open(url)
                                             }
+                                        case .Note:
+                                            print("A note")
                                         }
                                     }
                                 }) {
