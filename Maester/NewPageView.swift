@@ -108,7 +108,7 @@ struct NewPageView: View {
                     .font(.headline)
                 ScrollView {
                     // TextField("Page Content (Required)", text: $state.write_page.content).padding(.top, 0).lineLimit(5)
-                    MultilineTextField("C", text: $state.write_page.content, onCommit: nil)
+                    MultilineTextField("Page Content (Required)", text: $state.write_page.content, onCommit: nil)
                 }.lineLimit(5).frame(maxHeight: 100, alignment: .leading)
                     .background(MaesterConstants.fieldBackground)
             }
@@ -155,7 +155,7 @@ struct NewPageView: View {
                     }
                     .cornerRadius(4)
                     .foregroundColor(.white)
-                    .padding(10)
+                    .padding(.vertical, 10)
                 }
             }
             InputSuggestion(book: $state.book.tags, value: $new_tag)

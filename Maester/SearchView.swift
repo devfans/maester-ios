@@ -26,8 +26,8 @@ struct SearchSuggestion: View {
                     Text(item)
                     .padding(.horizontal, 8)
                         .padding(.vertical, 5)
-                        .foregroundColor(Color(red: 39.0/255.0, green: 83.0/255.0, blue: 124.0/255.0, opacity: 0.8))
-                    .background(Color(red: 199.0/255.0, green: 213.0/255.0, blue: 244.0/255.0, opacity: 0.3))
+                        .foregroundColor(MaesterConstants.tagForeground)
+                        .background(MaesterConstants.tagBackground)
                     .cornerRadius(10)
                 }
                 .lineLimit(1)

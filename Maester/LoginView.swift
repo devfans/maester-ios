@@ -59,7 +59,7 @@ struct LoginView: View {
             VStack(alignment: .center) {
                 HStack {
                     Spacer()
-                    Text("Maester").font(.system(size: 40)).italic()
+                    Text("Maester").font(.system(size: 40)).italic().foregroundColor(MaesterConstants.faceBlue)
                     Spacer()
                 }
                 Text("Manage Your Pages Easily").font(.caption).foregroundColor(.gray).italic()
@@ -79,7 +79,7 @@ struct LoginView: View {
                     .font(.headline).foregroundColor(.gray)
                 TextField("Username/Email Address", text: $user)
                     .padding(.all)
-                    .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                    .background(MaesterConstants.fieldBackground)
                     .lineLimit(1)
             }
             
@@ -88,7 +88,7 @@ struct LoginView: View {
                     .font(.headline).foregroundColor(.gray)
                 SecureField("Password", text: $pass)
                     .padding(.all)
-                    .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                    .background(MaesterConstants.fieldBackground)
                     .lineLimit(1)
             }
             
@@ -104,7 +104,7 @@ struct LoginView: View {
                         .padding(.vertical, 10.0)
                     Spacer()
                 }
-               .background(Color.blue)
+               .background(MaesterConstants.faceBlue)
                 .cornerRadius(2)
                 .padding(.vertical, 10.0)
                 .padding(.horizontal, 0)

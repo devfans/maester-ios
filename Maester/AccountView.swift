@@ -21,7 +21,7 @@ struct AccountView: View {
                 }
                  HStack {
                      Spacer()
-                     Text("Maester").font(.system(size: 40)).italic()
+                    Text("Maester").font(.system(size: 40)).italic().foregroundColor(MaesterConstants.faceBlue)
                      Spacer()
                  }
                  Text("Manage Your Pages Easily").font(.caption).foregroundColor(.gray).italic()

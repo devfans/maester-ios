@@ -41,7 +41,7 @@ struct PageDetailView: View {
             HStack {
                 Text("Category")
                     .font(.headline)
-                    .foregroundColor(Color.blue)
+                    .foregroundColor(MaesterConstants.faceBlue)
                 Button(action: {
                     self.state.search_type = SearchType.Category.rawValue
                     self.state.search_keyword = self.state.read_page.category
@@ -50,10 +50,10 @@ struct PageDetailView: View {
                     self.state.entry = MainPage.Main
                 }) {
                     Text(self.state.read_page.category)
-                        .foregroundColor(Color.white)
+                        .foregroundColor(MaesterConstants.tagForeground)
                         .padding(.horizontal, 8.0)
                         .padding(.vertical, 2.0)
-                        .background(MaesterConstants.faceBlue)
+                        .background(MaesterConstants.tagBackground)
                 }
                 .cornerRadius(6.0)
                 .padding(.vertical, 1)
@@ -76,10 +76,10 @@ struct PageDetailView: View {
                             self.state.entry = MainPage.Main
                         }) {
                             Text(tag)
-                                .foregroundColor(Color.white)
+                                .foregroundColor(MaesterConstants.tagForeground)
                                 .padding(.horizontal, 8.0)
                                 .padding(.vertical, 4.0)
-                                .background(MaesterConstants.faceBlue)
+                                .background(MaesterConstants.tagBackground)
                         }.cornerRadius(6.0)
                         // .padding(.horizontal, 8)
                         // .padding(.vertical, 5)
