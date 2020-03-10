@@ -157,7 +157,25 @@ struct ContentView: View {
     @State private var selection = 0
     @EnvironmentObject var state: MaesterState
     @State private var show_account = false
+    @State private var show_delete_alert = false
+    @State private var delete_page_id: String? = nil
     // @State private var show_page_detail = false
+    
+    
+    private func delete_page () {
+        if let page_id = self.delete_page_id {
+            print("Deleting page \(page_id)")
+            let action = PageAction.Delete(page_id)
+             _ = self.state.book.apply_action(action: action)
+            self.state.sync()
+            print("Deleted page")
+            // self.presentationMode.wrappedValue.dismiss()
+            self.state.show_page_detail = false
+            self.state.read_page = Page(withLink: "")
+            self.state.read_page_id = ""
+            self.state.search()
+        }
+    }
  
     var body: some View {
         Group {
@@ -208,6 +226,21 @@ struct ContentView: View {
                                     .padding(.vertical, 0)
                                 }.padding(.vertical, -4)
                             }
+                        }
+                        .onDelete(perform: {index in
+                            if let index_value = index.first {
+                                let page = self.state.book.history[index_value]
+                                self.delete_page_id = page.0
+                                self.show_delete_alert = true
+                                print("Will remove \(page.1.name)")
+                            }
+                            
+                        }).alert(isPresented: $show_delete_alert) {
+                            Alert(title: Text("Delete Page"), message: Text("Are you sure to remove this page?"), primaryButton: .destructive(Text("Delete")) {
+                                    self.delete_page()
+                                    self.show_delete_alert = false
+                                }, secondaryButton: .cancel()
+                            )
                         }
                     }
                     .navigationBarTitle(Text("Recent"))

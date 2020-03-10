@@ -74,7 +74,7 @@ class MaesterState: ObservableObject {
     @Published var write_page_type = 0
     @Published var search_type = 3
     @Published var search_keyword = ""
-    @Published var search_ressults = [String]()
+    @Published var search_results = [String]()
     @Published var sync_status = SyncStatus.Login
     @Published var selected_page_id = ""
     @Published var user = "Local"
@@ -103,7 +103,7 @@ class MaesterState: ObservableObject {
     }
     
     public func search() {
-        self.search_ressults = self.book.search(self.search_keyword, self.search_type)
+        self.search_results = self.book.search(self.search_keyword, self.search_type)
         self.check_sync()
     }
     

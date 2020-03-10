@@ -16,6 +16,23 @@ struct SearchResultView: View {
     @EnvironmentObject var state: MaesterState
     
     private let search_types = ["keyword", "category", "tag", "name", "content"]
+    @State private var show_delete_alert = false
+    @State private var delete_page_id: String? = nil
+    
+    private func delete_page () {
+        if let page_id = self.delete_page_id {
+            print("Deleting page \(page_id)")
+            let action = PageAction.Delete(page_id)
+             _ = self.state.book.apply_action(action: action)
+            self.state.sync()
+            print("Deleted page")
+            // self.presentationMode.wrappedValue.dismiss()
+            self.state.show_page_detail = false
+            self.state.read_page = Page(withLink: "")
+            self.state.read_page_id = ""
+            self.state.search()
+        }
+    }
     
     var body: some View {
         let pi = Binding<Int>(get: { () -> Int in
@@ -36,7 +53,7 @@ struct SearchResultView: View {
             */
             
             List {
-                ForEach(self.state.search_ressults, id: \.self) { page_id in
+                ForEach(self.state.search_results, id: \.self) { page_id in
                     Group {
                         if self.state.book.has_page(id: page_id) {
                             HStack {
@@ -74,6 +91,19 @@ struct SearchResultView: View {
                             }.padding(.vertical, -4)
                         }
                     }
+                }.onDelete(perform: {index in
+                    if let index_value = index.first {
+                        self.delete_page_id = self.state.search_results[index_value]
+                        self.show_delete_alert = true
+                        print("Will remove \(self.delete_page_id ?? "")")
+                    }
+                    
+                }).alert(isPresented: $show_delete_alert) {
+                    Alert(title: Text("Delete Page"), message: Text("Are you sure to remove this page?"), primaryButton: .destructive(Text("Delete")) {
+                            self.delete_page()
+                            self.show_delete_alert = false
+                        }, secondaryButton: .cancel()
+                    )
                 }
             }
             Spacer()
@@ -83,7 +113,7 @@ struct SearchResultView: View {
                 }
             }.pickerStyle(SegmentedPickerStyle()).foregroundColor(Color.blue)
         }//.padding(.top, -60)
-            .navigationBarTitle("\(self.state.search_keyword) - Found \(self.state.search_ressults.count) items", displayMode: .inline)
+            .navigationBarTitle("\(self.state.search_keyword) - Found \(self.state.search_results.count) items", displayMode: .inline)
     }
 }
 
