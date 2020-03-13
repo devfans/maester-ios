@@ -48,7 +48,7 @@ struct AccountView: View {
                          .padding(.vertical, 10.0)
                      Spacer()
                  }
-                .background(Color.black)
+                .background(self.state.style.secondaryButton)
                  .cornerRadius(2)
                  .padding(.vertical, 10.0)
                  .padding(.horizontal, 0)
@@ -76,7 +76,7 @@ struct AccountView: View {
             HStack(alignment: .center) {
                 Spacer()
                 Image(systemName: "person.circle")
-                Text(self.state.user).foregroundColor(.black).font(.subheadline).italic()
+                Text(self.state.user).foregroundColor(self.state.style.textColor).font(.subheadline).italic()
                 Spacer()
             }
         

@@ -14,6 +14,9 @@ struct SearchSuggestion: View {
     @Binding var book: [String: Int]
     @Binding var value: String
     @Binding var search_type: Int
+    
+    @EnvironmentObject var state: MaesterState
+    
     var searching_type: Int
     
     var body: some View {
@@ -26,8 +29,8 @@ struct SearchSuggestion: View {
                     Text(item)
                     .padding(.horizontal, 8)
                         .padding(.vertical, 5)
-                        .foregroundColor(MaesterConstants.tagForeground)
-                        .background(MaesterConstants.tagBackground)
+                        .foregroundColor(self.state.style.tagForegroundColor)
+                        .background(self.state.style.tagBackgroundColor)
                     .cornerRadius(10)
                 }
                 .lineLimit(1)
@@ -96,8 +99,8 @@ struct SearchView: View {
                 }*/
                 HStack {
                     TextField("Search Tags, Categories, Keyword", text: $state.search_keyword)
-                        .padding(.leading, 10)
-                    .padding(.vertical, 16)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 16).background(self.state.style.fieldBackgroundColor)
                     
                     NavigationLink(destination: SearchResultView(), tag: 1, selection: $selection) {
                         Button(action: {
@@ -105,18 +108,18 @@ struct SearchView: View {
                             self.selection = 1
                         }) {
                         Text("Search")
-                            .padding(.vertical, 16)
-                            .padding(.horizontal, 10)
-                            .foregroundColor(Color.white)
-                            .background(MaesterConstants.faceBlue)
+                            .padding(.vertical, 17)
+                            .padding(.horizontal, 12)
                         }
-                    }.disabled(self.state.search_keyword.count < 1)
-                }.background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                    }.disabled(self.state.search_keyword.count < 1).background(MaesterConstants.faceBlue)
+                        .padding(.leading, -10)
+                    .foregroundColor(Color.white)
+                }//.background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
             }.padding(.bottom, 10)
             VStack {
                 HStack {
                     Text("Tags")
-                        .foregroundColor(MaesterConstants.faceBlue)
+                        .foregroundColor(self.state.style.subtitleColor)
                         .padding(.leading, 20)
                     Spacer()
                 }
@@ -131,7 +134,7 @@ struct SearchView: View {
             VStack {
                 HStack {
                     Text("Categories")
-                        .foregroundColor(MaesterConstants.faceBlue)
+                        .foregroundColor(self.state.style.subtitleColor)
                         .padding(.leading, 20)
                     Spacer()
                 }
@@ -152,6 +155,6 @@ struct SearchView: View {
 
 struct SearchView_Previews: PreviewProvider {
     static var previews: some View {
-        SearchView().environmentObject(MaesterState())
+        SearchView().environment(\.colorScheme, .dark).environmentObject(MaesterState())
     }
 }

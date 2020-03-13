@@ -9,6 +9,8 @@
 import SwiftUI
 
 struct LabelText: View {
+    @EnvironmentObject var state: MaesterState
+    
     var label: String
     var value: String
     
@@ -26,7 +28,7 @@ struct LabelText: View {
                 Spacer()
             }
             .padding(.vertical, 1)
-            .background(MaesterConstants.fieldBackground)
+            .background(self.state.style.fieldBackgroundColor)
                 
         }.padding(.horizontal, 10)
     }
@@ -50,10 +52,10 @@ struct PageDetailView: View {
                     self.state.entry = MainPage.Main
                 }) {
                     Text(self.state.read_page.category)
-                        .foregroundColor(MaesterConstants.tagForeground)
+                        .foregroundColor(self.state.style.tagForegroundColor)
                         .padding(.horizontal, 8.0)
                         .padding(.vertical, 2.0)
-                        .background(MaesterConstants.tagBackground)
+                        .background(self.state.style.tagBackgroundColor)
                 }
                 .cornerRadius(6.0)
                 .padding(.vertical, 1)
@@ -76,10 +78,10 @@ struct PageDetailView: View {
                             self.state.entry = MainPage.Main
                         }) {
                             Text(tag)
-                                .foregroundColor(MaesterConstants.tagForeground)
+                                .foregroundColor(self.state.style.tagForegroundColor)
                                 .padding(.horizontal, 8.0)
                                 .padding(.vertical, 4.0)
-                                .background(MaesterConstants.tagBackground)
+                                .background(self.state.style.tagBackgroundColor)
                         }.cornerRadius(6.0)
                         // .padding(.horizontal, 8)
                         // .padding(.vertical, 5)
@@ -101,9 +103,10 @@ struct PageDetailView: View {
                 }.padding(.vertical, 10)
                 HStack {
                     Text(self.state.read_page.page_type.rawValue)
-                        .foregroundColor(MaesterConstants.faceBlue)
+                        .foregroundColor(self.state.style.subtitleColor)
                     .padding(.vertical, 10)
-                    .padding(.horizontal, 10)
+                        .padding(.horizontal, 10)
+                        
                     Spacer()
                     Button(action: {
                         if let url = URL(string: self.state.read_page.content) {
@@ -119,7 +122,7 @@ struct PageDetailView: View {
                     }.cornerRadius(6)
                 }
                 .padding(.vertical, 1)
-                .background(MaesterConstants.fieldBackground)
+                .background(self.state.style.fieldBackgroundColor)
                     
             }.padding(.horizontal, 10)
             // LabelText(label: "Content", value: self.state.read_page.content)
@@ -138,7 +141,7 @@ struct PageDetailView: View {
                 }
                 .padding(.vertical, 1)
                 .padding(.horizontal, 3)
-                .background(MaesterConstants.fieldBackground)
+                .background(self.state.style.fieldBackgroundColor)
                     
             }.padding(.horizontal, 10)
             LabelText(label: "Date Created", value: String(self.state.read_page.time))

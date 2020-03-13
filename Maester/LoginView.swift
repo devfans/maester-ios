@@ -59,10 +59,10 @@ struct LoginView: View {
             VStack(alignment: .center) {
                 HStack {
                     Spacer()
-                    Text("Maester").font(.system(size: 40)).italic().foregroundColor(MaesterConstants.faceBlue)
+                    Text("Maester").font(.system(size: 40)).italic().foregroundColor(self.state.style.tintColor)
                     Spacer()
                 }
-                Text("Manage Your Pages Easily").font(.caption).foregroundColor(.gray).italic()
+                Text("Manage Your Pages Easily").font(.caption).foregroundColor(self.state.style.captionColor).italic()
             }.padding(.top, 100)
                 .padding(.bottom, 10)
             
@@ -76,19 +76,19 @@ struct LoginView: View {
                 */
             VStack(alignment: .leading) {
                 Text("Account Name")
-                    .font(.headline).foregroundColor(.gray)
+                    .font(.headline).foregroundColor(self.state.style.captionColor)
                 TextField("Username/Email Address", text: $user)
                     .padding(.all)
-                    .background(MaesterConstants.fieldBackground)
+                    .background(self.state.style.fieldBackgroundColor)
                     .lineLimit(1)
             }
             
             VStack(alignment: .leading) {
                 Text("Password")
-                    .font(.headline).foregroundColor(.gray)
+                    .font(.headline).foregroundColor(self.state.style.captionColor)
                 SecureField("Password", text: $pass)
                     .padding(.all)
-                    .background(MaesterConstants.fieldBackground)
+                    .background(self.state.style.fieldBackgroundColor)
                     .lineLimit(1)
             }
             
@@ -100,11 +100,11 @@ struct LoginView: View {
                     Spacer()
                     Text("Login")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(self.state.style.textForegroundColor)
                         .padding(.vertical, 10.0)
                     Spacer()
                 }
-               .background(MaesterConstants.faceBlue)
+               .background(self.state.style.tintColor)
                 .cornerRadius(2)
                 .padding(.vertical, 10.0)
                 .padding(.horizontal, 0)
@@ -112,7 +112,7 @@ struct LoginView: View {
                 .padding(.vertical, 10.0)
                 .disabled(!valid_input())
        
-            HStack(alignment: .center) { Text(self.info).foregroundColor(.gray).italic().font(.caption).lineLimit(10)
+            HStack(alignment: .center) { Text(self.info).foregroundColor(self.state.style.captionColor).italic().font(.caption).lineLimit(10)
             }
             Spacer()
         }.padding(.horizontal, 25)

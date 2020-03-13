@@ -14,13 +14,15 @@ struct LabelTextField: View {
     var placeholder: String
     @Binding var value: String
     
+    @EnvironmentObject var state: MaesterState
+    
     var body: some View {
         VStack(alignment: .leading) {
             Text(label)
                 .font(.headline)
             TextField(placeholder, text: $value)
                 .padding(.all)
-                .background(MaesterConstants.fieldBackground)
+                .background(self.state.style.fieldBackgroundColor)
         }
     }
 }
@@ -29,6 +31,8 @@ struct InputSuggestion: View {
     var size: Int = 2
     @Binding var book: [String: Int]
     @Binding var value: String
+    
+    @EnvironmentObject var state: MaesterState
     
     var body: some View {
         HStack{
@@ -39,8 +43,8 @@ struct InputSuggestion: View {
                     Text(item)
                         .padding(.horizontal, 5)
                         .padding(.vertical, 3)
-                        .foregroundColor(MaesterConstants.tagForeground)
-                        .background(MaesterConstants.tagBackground)
+                        .foregroundColor(self.state.style.tagForegroundColor)
+                        .background(self.state.style.tagBackgroundColor)
                     
                 }
                 .lineLimit(1)
@@ -110,7 +114,7 @@ struct NewPageView: View {
                     // TextField("Page Content (Required)", text: $state.write_page.content).padding(.top, 0).lineLimit(5)
                     MultilineTextField("Page Content (Required)", text: $state.write_page.content, onCommit: nil)
                 }.lineLimit(5).frame(maxHeight: 100, alignment: .leading)
-                    .background(MaesterConstants.fieldBackground)
+                    .background(self.state.style.fieldBackgroundColor)
             }
             VStack(alignment: .leading) {
                 Text("Tags")
@@ -125,7 +129,7 @@ struct NewPageView: View {
                             HStack {
                                 Text(tag)
                                 Image(systemName: "xmark.circle")
-                            }
+                            }.foregroundColor(self.state.style.tagForegroundColor)
                         }
                         .lineLimit(1)
                         // .padding(.horizontal, 8)
@@ -139,7 +143,7 @@ struct NewPageView: View {
                 HStack {
                     TextField("Add a new tag", text: $new_tag)
                         .padding(.all)
-                        .background(MaesterConstants.fieldBackground)
+                        .background(self.state.style.fieldBackgroundColor)
                     Button(action: {
                         if self.new_tag.count > 0 && !self.state.write_page.tags.contains(self.new_tag) {
                             self.state.write_page.tags.append(self.new_tag)

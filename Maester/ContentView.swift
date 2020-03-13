@@ -81,7 +81,7 @@ struct PageLauncher: View
     
     let page_type: PageType
     
-    @State var color = MaesterConstants.faceBlue
+    @EnvironmentObject var state: MaesterState
     
     static let images = [PageType.Link: Image("page_link"), PageType.Note: Image("page_text")]
 
@@ -90,7 +90,7 @@ struct PageLauncher: View
             Self.images[self.page_type]!
                 .resizable()
                 .renderingMode(.template)
-                .foregroundColor(self.color)
+                .foregroundColor(self.state.style.launcher)
                 .accessibility(label: Text("Page Launcher"))
                 .aspectRatio(1, contentMode: .fit)
                 .padding(.top, -2)
@@ -107,20 +107,22 @@ struct PageRow: View {
     var page: Page
     @Binding var read_page_id: String
     @State private var color = Color.black
+    
+    @EnvironmentObject var state: MaesterState
 
     var body: some View {
         VStack {
             HStack {
                 Text(page.name)
                     .font(.system(size: 15))
-                    .foregroundColor(Color.black).lineLimit(1)
+                    .foregroundColor(self.state.style.textColor).lineLimit(1)
                 Spacer()
                 ForEach(page.tags, id: \.self) { tag in
                     Text(tag)
                         .font(.system(size: 12))
                         .padding(.horizontal, 4)
-                        .foregroundColor(MaesterConstants.faceBlue)
-                        //.background(Color(red: 189.0/255.0, green: 183.0/255.0, blue: 184.0/255.0, opacity: 0.3))
+                        .foregroundColor(self.state.style.tagForegroundColor)
+                        .background(self.state.style.tagBackgroundColor)
                     .cornerRadius(5)
                 }
             }

@@ -39,6 +39,39 @@ struct MaesterConstants {
     static let app_group = "group.io.devfans.maester"
     static let file_login = "maester_login.json"
     static let local_only = false
+    
+    static let styles = [
+        UIUserInterfaceStyle.light: MaesterStyle (
+            fieldColor: Color.black,
+            fieldBackgroundColor: MaesterConstants.fieldBackground,
+            tintColor: MaesterConstants.faceBlue,
+            textColor: Color.black,
+            textForegroundColor: Color.white,
+            captionColor: Color.gray,
+            captionForegroundColor: Color.gray,
+            tagBackgroundColor: MaesterConstants.tagBackground,
+            tagForegroundColor: MaesterConstants.tagForeground,
+            titleColor: MaesterConstants.faceBlue,
+            subtitleColor: Color.black,
+            launcher: MaesterConstants.faceBlue,
+            secondaryButton: Color.black
+        ),
+        UIUserInterfaceStyle.dark: MaesterStyle (
+            fieldColor: Color.white,
+            fieldBackgroundColor: Color(red: 29.0/255.0, green: 33.0/255.0, blue: 38.0/255.0, opacity: 0.8),
+            tintColor: MaesterConstants.faceBlue,
+            textColor: Color.white,
+            textForegroundColor: Color.white,
+            captionColor: Color.gray,
+            captionForegroundColor: Color.gray,
+            tagBackgroundColor: Color(red: 60.0/255.0, green: 55.0/255.0, blue: 64.0/255.0, opacity: 0.5),
+            tagForegroundColor: Color(red: 109.0/255.0, green: 163.0/255.0, blue: 224.0/255.0, opacity: 1.0),
+            titleColor: MaesterConstants.faceBlue,
+            subtitleColor: Color.gray,
+            launcher: Color(red: 109.0/255.0, green: 163.0/255.0, blue: 224.0/255.0, opacity: 1.0),
+            secondaryButton: Color(red: 60.0/255.0, green: 55.0/255.0, blue: 64.0/255.0, opacity: 0.5)
+        )
+    ]
 }
 
 enum MainPage: Int {
@@ -64,6 +97,24 @@ enum SyncStatus: String {
     case Login
 }
 
+struct MaesterStyle {
+    public let fieldColor: Color
+    public let fieldBackgroundColor: Color
+    public let tintColor: Color
+    public let textColor: Color
+    public let textForegroundColor: Color
+    public let captionColor: Color
+    public let captionForegroundColor: Color
+    public let tagBackgroundColor: Color
+    public let tagForegroundColor: Color
+    public let titleColor: Color
+    public let subtitleColor: Color
+    public let launcher: Color
+    public let secondaryButton: Color
+}
+
+
+
 class MaesterState: ObservableObject {
     @Published var book = MaesterBook.shared
     @Published var entry = MainPage.Main
@@ -81,6 +132,28 @@ class MaesterState: ObservableObject {
     @Published var show_new_page = false
     @Published var show_page_detail = false
     
+    private var last_style: UIUserInterfaceStyle
+    public var style: MaesterStyle
+    
+    init() {
+        last_style = UIScreen.main.traitCollection.userInterfaceStyle
+        style = Self.get_style(last_style)
+    }
+    
+    public func update_style () {
+        if self.last_style != UIScreen.main.traitCollection.userInterfaceStyle {
+            self.last_style = UIScreen.main.traitCollection.userInterfaceStyle
+            self.style = Self.get_style(self.last_style)
+        }
+    }
+    
+    static func get_style(_ in_style: UIUserInterfaceStyle) -> MaesterStyle {
+        if in_style == .light {
+            return MaesterConstants.styles[.light]!
+        } else {
+            return MaesterConstants.styles[.dark]!
+        }
+    }
     
     public func sync(force: Bool = false) {
         let before = self.sync_status
