@@ -15,7 +15,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         let state = (UIApplication.shared.delegate as! AppDelegate).state
-
+        state.update_style()
         if state.sync_status == .Login {
             state.book.start { status in
                 print("initial sync state: \(status)")
