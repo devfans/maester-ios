@@ -105,8 +105,9 @@ struct NewPageView: View {
                 }
             }
             // LabelTextField(label: "Tags", placeholder: "Page Tags", value: $new_tag)
-            // LabelTextField(label: "Content", placeholder: "Page Content (Required)", value: $state.write_page.content)
+            LabelTextField(label: "Content", placeholder: "Page Content (Required)", value: $state.write_page.content)
 
+            /*
             VStack(alignment: .leading) {
                 Text("Content")
                     .font(.headline)
@@ -115,7 +116,7 @@ struct NewPageView: View {
                     MultilineTextField("Page Content (Required)", text: $state.write_page.content, onCommit: nil)
                 }.lineLimit(5).frame(maxHeight: 100, alignment: .leading)
                     .background(self.state.style.fieldBackgroundColor)
-            }
+            }*/
             VStack(alignment: .leading) {
                 Text("Tags")
                     .font(.headline)

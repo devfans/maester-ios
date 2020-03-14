@@ -252,7 +252,7 @@ struct ContentView: View {
                             /*Image("user").resizable().renderingMode(.template).foregroundColor(Color.blue)
                                 .aspectRatio(1, contentMode: .fit)
                                 .frame(width: 20, height: 20)*/
-                            Image(systemName: "person.crop.circle").foregroundColor(MaesterConstants.faceBlue)
+                            Image(systemName: "person.crop.circle").foregroundColor(MaesterConstants.faceBlue).padding(.all)
                         },
                         trailing: Button(action: {
                             self.state.write_page = Page(withLink: "")
@@ -261,7 +261,7 @@ struct ContentView: View {
                             self.state.show_new_page = true
                             self.state.check_sync()
                         }) {
-                            Image(systemName: "square.and.pencil").foregroundColor(MaesterConstants.faceBlue)
+                            Image(systemName: "square.and.pencil").foregroundColor(MaesterConstants.faceBlue).padding(.all)
                         }.sheet(isPresented: self.$state.show_new_page) {
                             NewPageView(page_id: "").environmentObject(self.state)
                         }
@@ -282,7 +282,7 @@ struct ContentView: View {
                             /*Image("user").resizable().renderingMode(.template).foregroundColor(Color.blue)
                                 .aspectRatio(1, contentMode: .fit)
                                 .frame(width: 20, height: 20)*/
-                            Image(systemName: "person.crop.circle").foregroundColor(MaesterConstants.faceBlue)
+                            Image(systemName: "person.crop.circle").foregroundColor(MaesterConstants.faceBlue).padding(.all)
                         },
                         trailing: Button(action: {
                             self.state.write_page = Page(withLink: "")
@@ -291,7 +291,7 @@ struct ContentView: View {
                             self.state.show_new_page = true
                             self.state.check_sync()
                         }) {
-                            Image(systemName: "square.and.pencil").foregroundColor(MaesterConstants.faceBlue)
+                            Image(systemName: "square.and.pencil").foregroundColor(MaesterConstants.faceBlue).padding(.all)
                         }.sheet(isPresented: self.$state.show_new_page) {
                             NewPageView(page_id: "").environmentObject(self.state)
                         }
