@@ -172,7 +172,8 @@ struct ContentView: View {
             self.state.sync()
             print("Deleted page")
             // self.presentationMode.wrappedValue.dismiss()
-            self.state.show_page_detail = false
+            self.state.show_recent_page_detail = false
+            self.state.show_search_page_detail = false
             self.state.read_page = Page(withLink: "")
             self.state.read_page_id = ""
             self.state.search()
@@ -201,15 +202,15 @@ struct ContentView: View {
                                         self.state.read_page = page.1
                                         self.state.read_page_id = page.0
                                         // self.state.entry = .PageDetail
-                                        self.state.show_page_detail = true
+                                        self.state.show_recent_page_detail = true
                                         self.state.check_sync()
                                         
                                     }) {
                                         PageRow(page_id: self.state.book.history[index].0, page: self.state.book.history[index].1, read_page_id: self.$state.read_page_id)
                                         }.buttonStyle(BorderlessButtonStyle())
                                     .padding(.vertical, 0).padding(.trailing, -4)
-                                        .sheet(isPresented: self.$state.show_page_detail) {
-                                            PageDetailView().environmentObject(self.state)
+                                        .sheet(isPresented: self.$state.show_recent_page_detail) {
+                                            PageDetailView(tab_selection: self.$selection).environmentObject(self.state)
                                     }
                                     Button (action: {
                                         let page = self.state.book.history[index].1

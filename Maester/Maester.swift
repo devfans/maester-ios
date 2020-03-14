@@ -130,7 +130,9 @@ class MaesterState: ObservableObject {
     @Published var selected_page_id = ""
     @Published var user = "Local"
     @Published var show_new_page = false
-    @Published var show_page_detail = false
+    @Published var show_recent_page_detail = false
+    @Published var show_search_page_detail = false
+    @Published var search_selection: Int? = nil
     
     private var last_style: UIUserInterfaceStyle
     public var style: MaesterStyle

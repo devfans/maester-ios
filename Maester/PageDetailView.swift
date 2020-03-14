@@ -36,6 +36,7 @@ struct LabelText: View {
 
 struct PageDetailView: View {
     @EnvironmentObject var state: MaesterState
+    @Binding var tab_selection: Int
     // @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
@@ -47,9 +48,13 @@ struct PageDetailView: View {
                 Button(action: {
                     self.state.search_type = SearchType.Category.rawValue
                     self.state.search_keyword = self.state.read_page.category
-                    // self.state.search()
+                    self.tab_selection = 0
+                    self.state.show_recent_page_detail = false
+                    self.state.show_search_page_detail = false
+                    self.state.search_selection = 1
+                    self.state.search()
                     // self.main_selection = 0
-                    self.state.entry = MainPage.Main
+                    // self.state.entry = MainPage.Main
                 }) {
                     Text(self.state.read_page.category)
                         .foregroundColor(self.state.style.tagForegroundColor)
@@ -73,9 +78,13 @@ struct PageDetailView: View {
                         Button(action: {
                             self.state.search_type = SearchType.Tag.rawValue
                             self.state.search_keyword = tag
-                            // self.state.search()
+                            self.tab_selection = 0
+                            self.state.show_recent_page_detail = false
+                            self.state.show_search_page_detail = false
+                            self.state.search()
+                            self.state.search_selection = 1
                             // self.main_selection = 0
-                            self.state.entry = MainPage.Main
+                            // self.state.entry = MainPage.Main
                         }) {
                             Text(tag)
                                 .foregroundColor(self.state.style.tagForegroundColor)
@@ -182,7 +191,8 @@ struct PageDetailView: View {
                     self.state.sync()
                     print("Deleted page")
                     // self.presentationMode.wrappedValue.dismiss()
-                    self.state.show_page_detail = false
+                    self.state.show_search_page_detail = false
+                    self.state.show_recent_page_detail = false
                     self.state.read_page = Page(withLink: "")
                     self.state.read_page_id = ""
                     self.state.search()
@@ -204,7 +214,8 @@ struct PageDetailView: View {
                 
                 Button(action: {
                     // self.presentationMode.wrappedValue.dismiss()
-                    self.state.show_page_detail = false
+                    self.state.show_search_page_detail = false
+                    self.state.show_recent_page_detail = false
                 }) {
                    HStack {
                         Spacer()
@@ -230,6 +241,7 @@ struct PageDetailView: View {
 
 struct PageDetailView_Previews: PreviewProvider {
     @State static var main_selection = 0
+    
     static var previews: some View {
         let state = MaesterState()
         var page = Page(withLink: "http://bing.com")
@@ -237,6 +249,6 @@ struct PageDetailView_Previews: PreviewProvider {
         page.tags = ["bing", "search"]
         page.name = "Bing"
         state.read_page = page
-        return  PageDetailView().environmentObject(state)
+        return  PageDetailView(tab_selection: $main_selection).environmentObject(state)
     }
 }

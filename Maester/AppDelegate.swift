@@ -31,11 +31,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the user discards a scene session.
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
-        print("stop0")
         for ss in sceneSessions {
-            print("stop1")
             if let scene = ss.scene, let _ = scene.delegate {
-                print("stop2")
+                // print("stop2")
                 // (delegate as! SceneDelegate).state.book.stop()
             }
         }

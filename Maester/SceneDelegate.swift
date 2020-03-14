@@ -74,6 +74,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         let state = (UIApplication.shared.delegate as! AppDelegate).state;
         
+        state.update_style()
         state.sync_status = MaesterConstants.local_only ? .Out : .Login
         // state.show_new_page = false
         state.book.start { status in
@@ -90,7 +91,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)
             
-            window.rootViewController = UIHostingController(rootView: entryView)
+            window.rootViewController = UIHostingController(rootView: entryView.onTapGesture {
+                    window.endEditing(true)
+            })
             self.window = window
             window.makeKeyAndVisible()
         }
@@ -106,6 +109,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidBecomeActive(_ scene: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
+        let state = (UIApplication.shared.delegate as! AppDelegate).state
+        state.update_style()
     }
 
     func sceneWillResignActive(_ scene: UIScene) {

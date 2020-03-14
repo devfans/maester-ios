@@ -14,6 +14,7 @@ class SearchResult {
 
 struct SearchResultView: View {
     @EnvironmentObject var state: MaesterState
+    @State var tab_selection = 0
     
     private let search_types = ["keyword", "category", "tag", "name", "content"]
     @State private var show_delete_alert = false
@@ -27,7 +28,8 @@ struct SearchResultView: View {
             self.state.sync()
             print("Deleted page")
             // self.presentationMode.wrappedValue.dismiss()
-            self.state.show_page_detail = false
+            self.state.show_recent_page_detail = false
+            self.state.show_search_page_detail = false
             self.state.read_page = Page(withLink: "")
             self.state.read_page_id = ""
             self.state.search()
@@ -63,14 +65,14 @@ struct SearchResultView: View {
                                         self.state.read_page = page
                                         self.state.read_page_id = page_id
                                         // self.state.entry = .PageDetail
-                                        self.state.show_page_detail = true
+                                        self.state.show_search_page_detail = true
                                     }
                                 }) {
                                     PageRow(page_id: page_id, page: self.state.book.get_page(id: page_id), read_page_id: self.$state.read_page_id)
                                 }.buttonStyle(BorderlessButtonStyle())
                                 .padding(.vertical, 0).padding(.trailing, -4)
-                                    .sheet(isPresented: self.$state.show_page_detail) {
-                                        PageDetailView().environmentObject(self.state)
+                                    .sheet(isPresented: self.$state.show_search_page_detail) {
+                                        PageDetailView(tab_selection: self.$tab_selection).environmentObject(self.state)
                                 }
                                 Button (action: {
                                     if let page = self.state.book.entity.data[page_id] {
