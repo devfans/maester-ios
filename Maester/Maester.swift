@@ -54,7 +54,8 @@ struct MaesterConstants {
             titleColor: MaesterConstants.faceBlue,
             subtitleColor: Color.black,
             launcher: MaesterConstants.faceBlue,
-            secondaryButton: Color.black
+            secondaryButton: Color.black,
+            listBackground: Color.white
         ),
         UIUserInterfaceStyle.dark: MaesterStyle (
             fieldColor: Color.white,
@@ -69,7 +70,8 @@ struct MaesterConstants {
             titleColor: MaesterConstants.faceBlue,
             subtitleColor: Color.gray,
             launcher: Color(red: 109.0/255.0, green: 163.0/255.0, blue: 224.0/255.0, opacity: 1.0),
-            secondaryButton: Color(red: 60.0/255.0, green: 55.0/255.0, blue: 64.0/255.0, opacity: 0.5)
+            secondaryButton: Color(red: 60.0/255.0, green: 55.0/255.0, blue: 64.0/255.0, opacity: 0.5),
+            listBackground: Color.black
         )
     ]
 }
@@ -111,6 +113,7 @@ struct MaesterStyle {
     public let subtitleColor: Color
     public let launcher: Color
     public let secondaryButton: Color
+    public let listBackground: Color
 }
 
 
@@ -179,6 +182,12 @@ class MaesterState: ObservableObject {
     
     public func search() {
         self.search_results = self.book.search(self.search_keyword, self.search_type)
+        self.check_sync()
+    }
+    
+    public func search_for(_ keyword: String) {
+        self.search_results = self.book.search(keyword, self.search_type)
+        self.search_keyword = keyword
         self.check_sync()
     }
     
@@ -499,10 +508,11 @@ class MaesterBook {
                 }
             }
         }
-        
+        /*
         for (k, v) in self.entity.data {
             print("entry: \(k) : \(v.content)")
         }
+         */
     }
     
     public func start(_ init_handler: @escaping (SyncStatus) -> Void) {
@@ -662,6 +672,22 @@ class MaesterBook {
             return token.user
         }
         return user
+    }
+    
+    public func gen_sample() {
+        let page = self.gen_sample_page()
+        let action = PageAction.Put(page.gen_id(), page)
+        _ = self.apply_action(action: action, queue: true, cache: true)
+        let page2 = self.gen_sample_page("https://cn.bing.com")
+        _ = self.apply_action(action: PageAction.Put(page2.gen_id(), page2), queue: true, cache: true)
+    }
+    
+    public func gen_sample_page(_ link: String = "https://bing.com") -> Page {
+        var page = Page(withLink: link)
+        page.name = "bing"
+        page.category = "search"
+        page.tags = ["search"]
+        return page
     }
 }
 

@@ -18,229 +18,237 @@ struct LabelText: View {
         VStack(alignment: .leading) {
             HStack {
                 Text(label)
-                .font(.headline)
+                    .font(.headline)
                 Spacer()
             }.padding(.vertical, 10)
             HStack {
                 Text(value)
-                .padding(.vertical, 10)
-                .padding(.horizontal, 10)
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 10)
                 Spacer()
             }
             .padding(.vertical, 1)
             .background(self.state.style.fieldBackgroundColor)
-                
+            
         }.padding(.horizontal, 10)
     }
 }
 
 struct PageDetailView: View {
     @EnvironmentObject var state: MaesterState
-    @Binding var tab_selection: Int
     // @Environment(\.presentationMode) var presentationMode
+    @State private var nav_edit: Int? = 0
+    @State private var show_delete_alert = false
+    @State var nav_result = false
+    @Binding var page_id: String
+    @Binding var page: Page
+    
+    private func delete_page () {
+        let action = PageAction.Delete(page_id)
+        _ = self.state.book.apply_action(action: action)
+        self.state.sync()
+        print("Deleted page")
+        // self.presentationMode.wrappedValue.dismiss()
+        //  self.state.show_search_page_detail = false
+        // self.state.show_recent_page_detail = false
+        // self.state.read_page = Page(withLink: "")
+        // self.state.read_page_id = ""
+        self.state.search()
+    }
+    
+    func nav_to_edit() -> some View {
+        // print("creating page edit view \(page_id)")
+        return EditPageView(page_id: page_id, page: page)
+    }
     
     var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text("Category")
-                    .font(.headline)
-                    .foregroundColor(MaesterConstants.faceBlue)
-                Button(action: {
-                    self.state.search_type = SearchType.Category.rawValue
-                    self.state.search_keyword = self.state.read_page.category
-                    self.tab_selection = 0
-                    self.state.show_recent_page_detail = false
-                    self.state.show_search_page_detail = false
-                    self.state.search_selection = 1
-                    self.state.search()
-                    // self.main_selection = 0
-                    // self.state.entry = MainPage.Main
-                }) {
-                    Text(self.state.read_page.category)
-                        .foregroundColor(self.state.style.tagForegroundColor)
-                        .padding(.horizontal, 8.0)
-                        .padding(.vertical, 2.0)
-                        .background(self.state.style.tagBackgroundColor)
-                }
-                .cornerRadius(6.0)
-                .padding(.vertical, 1)
-                .padding(.horizontal, 1)
-                
-            }.padding(.horizontal, 10)
-            LabelText(label: "Name", value: self.state.read_page.name)
-            
+        ScrollView(/*@START_MENU_TOKEN@*/.vertical/*@END_MENU_TOKEN@*/, showsIndicators: false) {
             VStack(alignment: .leading) {
-                Text("Tags")
-                    .font(.headline)
-                
-                HStack{
-                    ForEach(state.read_page.tags, id: \.self) { tag in
-                        Button(action: {
-                            self.state.search_type = SearchType.Tag.rawValue
-                            self.state.search_keyword = tag
-                            self.tab_selection = 0
-                            self.state.show_recent_page_detail = false
-                            self.state.show_search_page_detail = false
-                            self.state.search()
-                            self.state.search_selection = 1
-                            // self.main_selection = 0
-                            // self.state.entry = MainPage.Main
-                        }) {
-                            Text(tag)
-                                .foregroundColor(self.state.style.tagForegroundColor)
-                                .padding(.horizontal, 8.0)
-                                .padding(.vertical, 4.0)
-                                .background(self.state.style.tagBackgroundColor)
-                        }.cornerRadius(6.0)
-                        // .padding(.horizontal, 8)
-                        // .padding(.vertical, 5)
-                        // .foregroundColor(.blue)
-                        // .background(Color.clear)
-                        // .cornerRadius(10)
-                        // .lineLimit(1)
-                    }
-                }.padding(.top, 10)
-            }.padding(.horizontal, 10)
-                .padding(.vertical, 5)
-             
-            VStack(alignment: .leading) {
+                NavigationLink(destination: EditPageView(page_id: page_id, page: page), tag: 1, selection: self.$nav_edit) { Text("") }
+                NavigationLink("", destination: SearchResultView(), isActive: $nav_result)
                 HStack {
-                    Text("Type")
-                    .font(.headline)
-                        
-                    Spacer()
-                }.padding(.vertical, 10)
-                HStack {
-                    Text(self.state.read_page.page_type.rawValue)
-                        .foregroundColor(self.state.style.subtitleColor)
-                    .padding(.vertical, 10)
-                        .padding(.horizontal, 10)
-                        
-                    Spacer()
+                    Text("Category")
+                        .font(.headline)
+                        .foregroundColor(MaesterConstants.faceBlue)
                     Button(action: {
-                        if let url = URL(string: self.state.read_page.content) {
-                            UIApplication.shared.open(url)
-                        }
+                        self.state.search_type = SearchType.Category.rawValue
+                        // self.state.search_keyword = page.category
+                        // self.state.search_selection = 1
+                        self.state.search_for(page.category)
+                        self.nav_result = true
                     }) {
-                        Text("Open")
-                            .padding(.vertical, 10)
-                            .padding(.horizontal, 16)
-                        .foregroundColor(Color.white)
-                            .background(MaesterConstants.faceBlue)
-
-                    }.cornerRadius(6)
-                }
-                .padding(.vertical, 1)
-                .background(self.state.style.fieldBackgroundColor)
-                    
-            }.padding(.horizontal, 10)
-            // LabelText(label: "Content", value: self.state.read_page.content)
-            VStack(alignment: .leading) {
-                HStack {
-                    Text("Content")
-                    .font(.headline)
-                    Spacer()
-                }.padding(.vertical, 10)
-                GeometryReader { geo in
-                    ScrollView {
-                        Text(self.state.read_page.content)
-                            .padding(.vertical, 10).frame(width: geo.size.width, alignment: .leading)
-                        Spacer()
+                        Text(page.category)
+                            .foregroundColor(self.state.style.tagForegroundColor)
+                            .padding(.horizontal, 8.0)
+                            .padding(.vertical, 2.0)
+                            .background(self.state.style.tagBackgroundColor)
                     }
-                }
-                .padding(.vertical, 1)
-                .padding(.horizontal, 3)
-                .background(self.state.style.fieldBackgroundColor)
+                    .cornerRadius(6.0)
+                    .padding(.vertical, 1)
+                    .padding(.horizontal, 1)
                     
-            }.padding(.horizontal, 10)
-            LabelText(label: "Date Created", value: String(self.state.read_page.time))
-            
-            Spacer()
-            VStack {
-                Button(action: {
-                    self.state.write_page = self.state.read_page
-                    // self.state.entry = .EditPage
-                    // self.presentationMode.wrappedValue.dismiss()
-                    if let index = [PageType.Link, PageType.Note].firstIndex(of: self.state.write_page.page_type) {
-                        self.state.write_page_type = index
-                    }
-                    self.state.show_new_page = true
-                    self.state.check_sync()
-                 }) {
+                }.padding(.horizontal, 10)
+                LabelText(label: "Name", value: page.name)
+                
+                VStack(alignment: .leading) {
+                    Text("Tags")
+                        .font(.headline)
+                    
+                    HStack{
+                        ForEach(page.tags, id: \.self) { tag in
+                            Button(action: {
+                                self.state.search_type = SearchType.Tag.rawValue
+                                // self.state.search_keyword = tag
+                                // self.state.show_recent_page_detail = false
+                                // self.state.show_search_page_detail = false
+                                self.state.search_for(tag)
+                                self.nav_result = true
+                                // self.state.search_selection = 1
+                                // self.main_selection = 0
+                                // self.state.entry = MainPage.Main
+                            }) {
+                                Text(tag)
+                                    .foregroundColor(self.state.style.tagForegroundColor)
+                                    .padding(.horizontal, 8.0)
+                                    .padding(.vertical, 4.0)
+                                    .background(self.state.style.tagBackgroundColor)
+                            }.cornerRadius(6.0)
+                            // .padding(.horizontal, 8)
+                            // .padding(.vertical, 5)
+                            // .foregroundColor(.blue)
+                            // .background(Color.clear)
+                            // .cornerRadius(10)
+                            // .lineLimit(1)
+                        }
+                    }.padding(.top, 10)
+                }.padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                
+                VStack(alignment: .leading) {
                     HStack {
-                         Spacer()
-                         Text("Edit")
-                             .font(.headline)
-                             .foregroundColor(.white)
-                             .padding(.vertical, 10.0)
-                         Spacer()
+                        Text("Type")
+                            .font(.headline)
+                        
+                        Spacer()
+                    }.padding(.vertical, 10)
+                    HStack {
+                        Text(page.page_type.rawValue)
+                            .foregroundColor(self.state.style.subtitleColor)
+                            .padding(.vertical, 10)
+                            .padding(.horizontal, 10)
+                        
+                        Spacer()
+                        Button(action: {
+                            if let url = URL(string: page.content) {
+                                UIApplication.shared.open(url)
+                            }
+                        }) {
+                            Text("Open")
+                                .padding(.vertical, 10)
+                                .padding(.horizontal, 16)
+                                .foregroundColor(Color.white)
+                                .background(MaesterConstants.faceBlue)
+                            
+                        }.cornerRadius(6)
+                    }
+                    .padding(.vertical, 1)
+                    .background(self.state.style.fieldBackgroundColor)
+                    
+                }.padding(.horizontal, 10)
+                // LabelText(label: "Content", value: self.state.read_page.content)
+                VStack(alignment: .leading) {
+                    HStack {
+                        Text("Content")
+                            .font(.headline)
+                        Spacer()
+                    }.padding(.vertical, 10)
+                    /*
+                     GeometryReader { geo in
+                     ScrollView {
+                     Text(self.state.read_page.content)
+                     .padding(.vertical, 10).frame(width: geo.size.width, alignment: .leading)
+                     Spacer()
                      }
-                    .background(MaesterConstants.faceBlue)
-                     .cornerRadius(4)
-                     .padding(.vertical, 10.0)
-                     .padding(.horizontal, 0)
-                 }
-                     .padding(.vertical, 3)
-                .sheet(isPresented: self.$state.show_new_page) {
-                    EditPageView().environmentObject(self.state)
-                }
-                
-                Button(action: {
-                    let action = PageAction.Delete(self.state.read_page_id)
-                     _ = self.state.book.apply_action(action: action)
-                    self.state.sync()
-                    print("Deleted page")
-                    // self.presentationMode.wrappedValue.dismiss()
-                    self.state.show_search_page_detail = false
-                    self.state.show_recent_page_detail = false
-                    self.state.read_page = Page(withLink: "")
-                    self.state.read_page_id = ""
-                    self.state.search()
-                }) {
-                   HStack {
-                        Spacer()
-                        Text("Delete")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding(.vertical, 10.0)
-                        Spacer()
+                     }*/
+                    GeometryReader { geo in
+                        ScrollView(/*@START_MENU_TOKEN@*/.vertical/*@END_MENU_TOKEN@*/, showsIndicators: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/, content: {
+                            Text(page.content)
+                        })
+                        .padding(.vertical, 5)
+                        .padding(.horizontal, 10)
+                        .frame(width: geo.size.width, height: 200, alignment: .leading)
+                        .background(self.state.style.fieldBackgroundColor)
                     }
-                   .background(Color.red)
-                    .cornerRadius(4)
-                    .padding(.vertical, 10.0)
-                    .padding(.horizontal, 0)
-                }
-                    .padding(.vertical, 5)
+                    
+                }.padding(.horizontal, 10).frame(height: 250)
+                LabelText(label: "Date Created", value: String(page.time))
                 
-                Button(action: {
-                    // self.presentationMode.wrappedValue.dismiss()
-                    self.state.show_search_page_detail = false
-                    self.state.show_recent_page_detail = false
-                }) {
-                   HStack {
-                        Spacer()
-                        Text("Cancel")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding(.vertical, 10.0)
-                        Spacer()
+                Spacer()
+                VStack {
+                    Button(action: {
+                        // self.state.write_page = self.state.read_page
+                        // self.state.entry = .EditPage
+                        // self.presentationMode.wrappedValue.dismiss()
+                        /*
+                        if let index = [PageType.Link, PageType.Note].firstIndex(of: self.state.write_page.page_type) {
+                            self.state.write_page_type = index
+                        }
+                        */
+                        // self.state.show_new_page = true
+                        self.nav_edit = 1
+                        self.state.check_sync()
+                    }) {
+                        HStack {
+                            Spacer()
+                            Text("Edit")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .padding(.vertical, 10.0)
+                            Spacer()
+                        }
+                        .background(MaesterConstants.faceBlue)
+                        .cornerRadius(4)
+                        .padding(.vertical, 10.0)
+                        .padding(.horizontal, 0)
                     }
-                   .background(MaesterConstants.faceBlue)
-                    .cornerRadius(4)
-                    .padding(.vertical, 10.0)
-                    .padding(.horizontal, 0)
-                }
+                    .padding(.vertical, 3)
+                    
+                    Button(action: {
+                        self.show_delete_alert = true
+                    }) {
+                        HStack {
+                            Spacer()
+                            Text("Delete")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .padding(.vertical, 10.0)
+                            Spacer()
+                        }
+                        .background(Color.red)
+                        .cornerRadius(4)
+                        .padding(.vertical, 10.0)
+                        .padding(.horizontal, 0)
+                    }
                     .padding(.vertical, 5)
-                
+                }
             }
-               
-        }.padding(.horizontal, 25)
-            .padding(.top, 30)
+        }
+        .padding(.horizontal, 25)
+        .padding(.top, 0).navigationBarTitle("Page Detail")
+        .alert(isPresented: $show_delete_alert) {
+            Alert(title: Text("Delete Page"), message: Text("Are you sure to remove this page?"), primaryButton: .destructive(Text("Delete")) {
+                self.delete_page()
+                self.show_delete_alert = false
+            }, secondaryButton: .cancel()
+            )
+        }
     }
 }
 
 struct PageDetailView_Previews: PreviewProvider {
-    @State static var main_selection = 0
+    @State static var page_id = ""
+    @State static var page = Page(withLink: "")
+    
     
     static var previews: some View {
         let state = MaesterState()
@@ -249,6 +257,6 @@ struct PageDetailView_Previews: PreviewProvider {
         page.tags = ["bing", "search"]
         page.name = "Bing"
         state.read_page = page
-        return  PageDetailView(tab_selection: $main_selection).environmentObject(state)
+        return  PageDetailView(page_id: $page_id, page: $page).environmentObject(state)
     }
 }

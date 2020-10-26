@@ -20,6 +20,7 @@ struct SearchSuggestion: View {
     var searching_type: Int
     
     var body: some View {
+        
         HStack{
             ForEach(MaesterBook.suggest(index: self.book, value: self.value), id: \.self) { item in
                 Button(action: {
@@ -27,11 +28,11 @@ struct SearchSuggestion: View {
                     self.search_type = self.searching_type
                 }) {
                     Text(item)
-                    .padding(.horizontal, 8)
+                        .padding(.horizontal, 8)
                         .padding(.vertical, 5)
                         .foregroundColor(self.state.style.tagForegroundColor)
                         .background(self.state.style.tagBackgroundColor)
-                    .cornerRadius(10)
+                        .cornerRadius(10)
                 }
                 .lineLimit(1)
             }
@@ -44,33 +45,46 @@ struct SearchSuggestion: View {
 
 struct SearchView: View {
     @EnvironmentObject var state: MaesterState
+    @State var search_keyword: String
+    @State var nav_result :Int?
+    
+    func get_search_results() -> some View {
+        SearchResultView()
+    }
     
     var body: some View {
         VStack(alignment: .leading) {
             VStack(alignment: .leading) {
-                /*
                 HStack {
-                    Text("Search")
-                        .font(.title)
-                        .padding(.leading, 20)
                     Spacer()
-                }*/
-                NavigationLink(destination: SearchResultView(), tag: 1, selection: self.$state.search_selection) { Text("") }
+                    Text("Maester")
+                        .font(.system(size: 30))
+                        .italic()
+                        .foregroundColor(self.state.style.launcher)
+                    Spacer()
+                }
+                NavigationLink(destination: LazyView(get_search_results), tag: 1, selection: self.$nav_result) { Text("") }
+                // NavigationLink("", destination: SearchResultView(), isActive: $nav_result)
+                
                 HStack {
-                    TextField("Search Tags, Categories, Keyword", text: $state.search_keyword)
+                    TextField("Search Tags, Categories, Keyword", text: $search_keyword)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 16).background(self.state.style.fieldBackgroundColor)
                     
                     Button(action: {
-                        self.state.search()
-                        self.state.search_selection = 1
+                        // print("Searching \(self.search_keyword) now")
+                        self.state.search_for(self.search_keyword)
+                        // self.state.search_keyword = self.search_keyword
+                        // self.state.search()
+                        // self.state.search_selection = 1
+                        self.nav_result = 1
                     }) {
                         Text("Search")
-                        .padding(.vertical, 17)
-                        .padding(.horizontal, 12)
-                    }.disabled(self.state.search_keyword.count < 1)
-                        .background(MaesterConstants.faceBlue)
-                        .padding(.leading, -10)
+                            .padding(.vertical, 17)
+                            .padding(.horizontal, 12)
+                    }.disabled(self.search_keyword.count < 1)
+                    .background(MaesterConstants.faceBlue)
+                    .padding(.leading, -10)
                     .foregroundColor(Color.white)
                 }//.background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
             }.padding(.bottom, 10)
@@ -84,7 +98,7 @@ struct SearchView: View {
                 .padding(.bottom, 12)
                 
                 HStack {
-                    SearchSuggestion(book: $state.book.tags, value: $state.search_keyword, search_type: $state.search_type, searching_type: SearchType.Tag.rawValue)
+                    SearchSuggestion(book: $state.book.tags, value: $search_keyword, search_type: $state.search_type, searching_type: SearchType.Tag.rawValue)
                     Spacer()
                 }
             }
@@ -99,7 +113,7 @@ struct SearchView: View {
                 .padding(.bottom, 12)
                 
                 HStack {
-                    SearchSuggestion(book: $state.book.categories, value: $state.search_keyword, search_type: $state.search_type, searching_type: SearchType.Category.rawValue)
+                    SearchSuggestion(book: $state.book.categories, value: $search_keyword, search_type: $state.search_type, searching_type: SearchType.Category.rawValue)
                     Spacer()
                 }
             }
@@ -107,12 +121,12 @@ struct SearchView: View {
             Spacer()
         }.padding(.horizontal, 15)
         .padding(.top, 20)
-
+        
     }
 }
 
 struct SearchView_Previews: PreviewProvider {
     static var previews: some View {
-        SearchView().environment(\.colorScheme, .dark).environmentObject(MaesterState())
+        SearchView(search_keyword: "").environment(\.colorScheme, .dark).environmentObject(MaesterState())
     }
 }

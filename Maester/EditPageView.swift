@@ -10,13 +10,20 @@ import SwiftUI
 
 struct EditPageView: View {
     @EnvironmentObject var state: MaesterState
+    
+    var page_id: String
+    var page: Page
+    
     var body: some View {
-        NewPageView(page_id: self.state.read_page_id)
+        return NewPageView(page_id: page_id, page: page).navigationBarTitle("Edit Page")
     }
 }
 
-struct EditPageView_Previews: PreviewProvider {
-    static var previews: some View {
-        EditPageView().environmentObject(MaesterState())
+struct CreatePageView: View {
+    var page_id: String
+    var page: Page
+    var body: some View {
+        NewPageView(page_id: page_id, page: page).navigationBarTitle("New Page")
     }
 }
+

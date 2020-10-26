@@ -17,7 +17,7 @@ struct SyncStatusView: UIViewRepresentable {
                           SyncStatus.In: Self.load_gif("in_sync"),
                           SyncStatus.Out: Self.load_gif("out_sync"),
                           SyncStatus.Login: Self.load_gif("out_sync")]
-        
+    
     func makeUIView(context: UIViewRepresentableContext<SyncStatusView>) -> UIImageView {
         return Self.img_view(self.images[self.status]!)
     }
@@ -38,17 +38,17 @@ struct SyncStatusView: UIViewRepresentable {
         // img.size = .init(width: 40, height: 40)
         // let newSize = CGSize.init(width: 40, height: 40)
         /*
-        UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0);
-        img.draw(in: CGRect(origin: CGPoint.zero, size: CGSize(width: newSize.width, height: newSize.height)))
-        let newImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
-        UIGraphicsEndImageContext()
-        */
+         UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0);
+         img.draw(in: CGRect(origin: CGPoint.zero, size: CGSize(width: newSize.width, height: newSize.height)))
+         let newImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
+         UIGraphicsEndImageContext()
+         */
         /*
-        let renderer = UIGraphicsImageRenderer(size: newSize)
-        let newImage = renderer.image { _ in
-            img.draw(in: CGRect.init(origin: CGPoint.zero, size: newSize))
-        }
-        */
+         let renderer = UIGraphicsImageRenderer(size: newSize)
+         let newImage = renderer.image { _ in
+         img.draw(in: CGRect.init(origin: CGPoint.zero, size: newSize))
+         }
+         */
         return img
     }
     
@@ -61,11 +61,11 @@ struct SyncStatusView: UIViewRepresentable {
         // image_view.frame = CGRectMake(0, 0, 10, 10);
         // image_view.center = image_view.superview!.center;
         // image_view.contentMode = .scaleAspectFit
-
+        
         /*
-        image_view.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
-        image_view.sizeToFit()
-        */
+         image_view.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+         image_view.sizeToFit()
+         */
         // image_view.startAnimating()
         
         return image_view
@@ -84,7 +84,7 @@ struct PageLauncher: View
     @EnvironmentObject var state: MaesterState
     
     static let images = [PageType.Link: Image("page_link"), PageType.Note: Image("page_text")]
-
+    
     var body: some View {
         VStack {
             Self.images[self.page_type]!
@@ -105,11 +105,10 @@ struct PageLauncher: View
 struct PageRow: View {
     var page_id: String
     var page: Page
-    @Binding var read_page_id: String
     @State private var color = Color.black
     
     @EnvironmentObject var state: MaesterState
-
+    
     var body: some View {
         VStack {
             HStack {
@@ -123,7 +122,7 @@ struct PageRow: View {
                         .padding(.horizontal, 4)
                         .foregroundColor(self.state.style.tagForegroundColor)
                         .background(self.state.style.tagBackgroundColor)
-                    .cornerRadius(5)
+                        .cornerRadius(5)
                 }
             }
             HStack {
@@ -132,24 +131,25 @@ struct PageRow: View {
                     .foregroundColor(Color.gray).lineLimit(1)
                 Spacer()
                 Text(page.category)
-                .font(.system(size: 12))
-                .foregroundColor(Color.gray)
+                    .font(.system(size: 12))
+                    .foregroundColor(Color.gray)
             }
         }
-            .padding(.bottom, 2)
-            .padding(.top, 1)
-            .padding(.trailing, 10)
-            .padding(.leading, 15)
+        .padding(.bottom, 2)
+        .padding(.top, 1)
+        .padding(.trailing, 10)
+        .padding(.leading, 15)
+        //.background(self.state.style.fieldBackgroundColor)
         // .background(self.read_page_id == self.page_id ? self.color_selected : self.color_hover)
     }
 }
 
 struct PageRow_Previews: PreviewProvider {
-    @State static var read_page_id = "page_id"
     static var previews: some View {
+        let state = MaesterState()
         Group {
-            PageRow(page_id: "", page: Page(withLink: "http://link1.com"), read_page_id: $read_page_id)
-            PageRow(page_id: "page_id", page: Page(withLink: "http://link2.com"), read_page_id: $read_page_id)
+            PageRow(page_id: "", page: Page(withLink: "http://link1.com")).environmentObject(state)
+            PageRow(page_id: "page_id", page: Page(withLink: "http://link2.com")).environmentObject(state)
         }
         .previewLayout(.fixed(width: 300, height: 70))
     }
@@ -161,6 +161,7 @@ struct ContentView: View {
     @State private var show_account = false
     @State private var show_delete_alert = false
     @State private var delete_page_id: String? = nil
+    
     // @State private var show_page_detail = false
     
     
@@ -168,7 +169,7 @@ struct ContentView: View {
         if let page_id = self.delete_page_id {
             print("Deleting page \(page_id)")
             let action = PageAction.Delete(page_id)
-             _ = self.state.book.apply_action(action: action)
+            _ = self.state.book.apply_action(action: action)
             self.state.sync()
             print("Deleted page")
             // self.presentationMode.wrappedValue.dismiss()
@@ -179,183 +180,112 @@ struct ContentView: View {
             self.state.search()
         }
     }
- 
+    
+    func nav_to_new_page() -> some View {
+        var page = state.write_page
+        page.page_type = .Link
+        
+        return CreatePageView(page_id: "", page: page)
+    }
+    
     var body: some View {
         Group {
-            
             VStack {
                 SyncStatusView(status: self.$state.sync_status)
                     .padding(.bottom, -12)
                     .padding(.top, -16).foregroundColor(MaesterConstants.faceBlue)
             }.frame(width: 30, height: 0).zIndex(100).padding(.top, 0)
             
-            
-            // if self.state.entry == MainPage.Main {
-            TabView(selection: $selection) {
-                NavigationView {
-                    List {
-                        ForEach(self.state.book.history.indices, id: \.self) { index in
-                            Group {
-                                HStack {
-                                    Button (action: {
-                                        let page = self.state.book.history[index]
-                                        self.state.read_page = page.1
-                                        self.state.read_page_id = page.0
-                                        // self.state.entry = .PageDetail
-                                        self.state.show_recent_page_detail = true
-                                        self.state.check_sync()
-                                        
-                                    }) {
-                                        PageRow(page_id: self.state.book.history[index].0, page: self.state.book.history[index].1, read_page_id: self.$state.read_page_id)
-                                        }.buttonStyle(BorderlessButtonStyle())
-                                    .padding(.vertical, 0).padding(.trailing, -4)
-                                        .sheet(isPresented: self.$state.show_recent_page_detail) {
-                                            PageDetailView(tab_selection: self.$selection).environmentObject(self.state)
-                                    }
-                                    Button (action: {
-                                        let page = self.state.book.history[index].1
-                                        switch page.page_type {
-                                        case .Link:
-                                            if let url = URL(string: page.content) {
-                                                UIApplication.shared.open(url)
-                                                // _ = NSWorkspace.shared.open(url)
-                                            }
-                                        case .Note:
-                                            print("A note")
-                                        }
-                                    }) {
-                                        PageLauncher(width: 32, height: 50, page_type: self.state.book.history[index].1.page_type)
-                                        }.buttonStyle(BorderlessButtonStyle())
-                                    .padding(.vertical, 0)
-                                }.padding(.vertical, -4)
-                            }
-                        }
-                        .onDelete(perform: {index in
-                            if let index_value = index.first {
-                                let page = self.state.book.history[index_value]
-                                self.delete_page_id = page.0
-                                self.show_delete_alert = true
-                                print("Will remove \(page.1.name)")
-                            }
-                            
-                        }).alert(isPresented: $show_delete_alert) {
-                            Alert(title: Text("Delete Page"), message: Text("Are you sure to remove this page?"), primaryButton: .destructive(Text("Delete")) {
-                                    self.delete_page()
-                                    self.show_delete_alert = false
-                                }, secondaryButton: .cancel()
-                            )
-                        }
-                    }
-                    .navigationBarTitle(Text("Recent"))
-                    .navigationBarItems(
-                        leading: NavigationLink(destination: AccountView()) {
-                            /*Image("user").resizable().renderingMode(.template).foregroundColor(Color.blue)
-                                .aspectRatio(1, contentMode: .fit)
-                                .frame(width: 20, height: 20)*/
-                            Image(systemName: "person.crop.circle").foregroundColor(MaesterConstants.faceBlue).padding(.all)
-                        },
-                        trailing: Button(action: {
-                            self.state.write_page = Page(withLink: "")
-                            self.state.new_page_data = [:]
-                            // self.state.entry = .AddPage
-                            self.state.show_new_page = true
-                            self.state.check_sync()
-                        }) {
-                            Image(systemName: "square.and.pencil").foregroundColor(MaesterConstants.faceBlue).padding(.all)
-                        }.sheet(isPresented: self.$state.show_new_page) {
-                            NewPageView(page_id: "").environmentObject(self.state)
-                        }
-                    )
-                    .navigationBarHidden(false)
-                }
-                    .tabItem {
-                        VStack {
-                            Image("recent").renderingMode(.template)
-                            Text("Recent")
-                        }.foregroundColor(MaesterConstants.faceBlue)
-                    }
-                    .tag(1)
-                NavigationView {
-                    SearchView()
-                    .navigationBarItems(
-                        leading: NavigationLink(destination: AccountView()) {
-                            /*Image("user").resizable().renderingMode(.template).foregroundColor(Color.blue)
-                                .aspectRatio(1, contentMode: .fit)
-                                .frame(width: 20, height: 20)*/
-                            Image(systemName: "person.crop.circle").foregroundColor(MaesterConstants.faceBlue).padding(.all)
-                        },
-                        trailing: Button(action: {
-                            self.state.write_page = Page(withLink: "")
-                            self.state.new_page_data = [:]
-                            // self.state.entry = .AddPage
-                            self.state.show_new_page = true
-                            self.state.check_sync()
-                        }) {
-                            Image(systemName: "square.and.pencil").foregroundColor(MaesterConstants.faceBlue).padding(.all)
-                        }.sheet(isPresented: self.$state.show_new_page) {
-                            NewPageView(page_id: "").environmentObject(self.state)
-                        }
-                    )
-                    .navigationBarTitle(Text("Search"))
-                    
-                }
-                    .tabItem {
+            NavigationView {
+                TabView(selection: $selection) {
+                    SearchView(search_keyword: "").tabItem {
                         VStack {
                             Image("search").renderingMode(.template)
                             Text("Search")
                         }.foregroundColor(MaesterConstants.faceBlue)
                     }
                     .tag(0)
+                    
+                    HistoryView().tabItem {
+                        VStack {
+                            Image("recent").renderingMode(.template)
+                            Text("Recent")
+                        }.foregroundColor(MaesterConstants.faceBlue)
+                    }.tag(1)
+                }
+                
+                // .navigationBarTitle(Text("Recent"))
+                .navigationBarItems(
+                    leading: NavigationLink(destination: AccountView()) {
+                        /*Image("user").resizable().renderingMode(.template).foregroundColor(Color.blue)
+                         .aspectRatio(1, contentMode: .fit)
+                         .frame(width: 20, height: 20)*/
+                        Image(systemName: "person.crop.circle").foregroundColor(MaesterConstants.faceBlue).padding(.all)
+                    },
+                    trailing: NavigationLink(destination: LazyView(nav_to_new_page), isActive: self.$state.show_new_page) {
+                        /*
+                         trailing: Button(action: {
+                         self.state.write_page = Page(withLink: "")
+                         self.state.new_page_data = [:]
+                         // self.state.entry = .AddPage
+                         // self.state.show_new_page = true
+                         self.nav_new = 1
+                         self.state.check_sync()
+                         }) { */
+                        Image(systemName: "square.and.pencil").foregroundColor(MaesterConstants.faceBlue).padding(.all)
+                    }
+                )
+                .navigationBarHidden(false).background(Color.black)
             }
             /*
-            } else if self.state.entry == MainPage.AddPage {
-                NavigationView  {
-                    NewPageView(page_id: "")
-                        .navigationBarHidden(false)
-                        .navigationBarTitle(Text("New Page"))
-                        .navigationBarItems(leading: Button(action: {
-                            self.state.entry = .Main
-                            self.state.new_page_data = [:]
-                            self.state.check_sync()
-                        })
-                        {
-                            Text("Cancel")
-                        })
-                }
-            } else if self.state.entry == MainPage.EditPage {
-                   NavigationView  {
-                       EditPageView()
-                           .navigationBarHidden(false)
-                           .navigationBarTitle(Text("Edit Page"))
-                           .navigationBarItems(leading: Button(action: {
-                               self.state.entry = .Main
-                               self.state.check_sync()
-                           })
-                           {
-                               Text("Cancel")
-                           })
-                    }
-            } else {
-                NavigationView {
-                    PageDetailView(main_selection: $selection)
-                        .navigationBarHidden(false)
-                        .navigationBarTitle(Text("Page Detail"))
-                        .navigationBarItems(leading: Button(action: {
-                            self.state.entry = .Main
-                            self.state.check_sync()
-                        })
-                        {
-                            Text("Back")
-                        }, trailing: Button(action: {
-                            self.state.write_page = self.state.read_page
-                            self.state.entry = .EditPage
-                            self.state.check_sync()
-                        })
-                        {
-                            Text("Edit")
-                        })
-                }
-            }*/
+             } else if self.state.entry == MainPage.AddPage {
+             NavigationView  {
+             NewPageView(page_id: "")
+             .navigationBarHidden(false)
+             .navigationBarTitle(Text("New Page"))
+             .navigationBarItems(leading: Button(action: {
+             self.state.entry = .Main
+             self.state.new_page_data = [:]
+             self.state.check_sync()
+             })
+             {
+             Text("Cancel")
+             })
+             }
+             } else if self.state.entry == MainPage.EditPage {
+             NavigationView  {
+             EditPageView()
+             .navigationBarHidden(false)
+             .navigationBarTitle(Text("Edit Page"))
+             .navigationBarItems(leading: Button(action: {
+             self.state.entry = .Main
+             self.state.check_sync()
+             })
+             {
+             Text("Cancel")
+             })
+             }
+             } else {
+             NavigationView {
+             PageDetailView(main_selection: $selection)
+             .navigationBarHidden(false)
+             .navigationBarTitle(Text("Page Detail"))
+             .navigationBarItems(leading: Button(action: {
+             self.state.entry = .Main
+             self.state.check_sync()
+             })
+             {
+             Text("Back")
+             }, trailing: Button(action: {
+             self.state.write_page = self.state.read_page
+             self.state.entry = .EditPage
+             self.state.check_sync()
+             })
+             {
+             Text("Edit")
+             })
+             }
+             }*/
         }
     }
 }
@@ -363,11 +293,14 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         let state = MaesterState()
-        state.sync(force: true)
+        state.style = MaesterState.get_style(.dark)
+        state.book.gen_sample()
+        // state.sync(force: true)
         for (id, page) in state.book.entity.data {
             state.book.insert_into_history(id: id, page: page)
         }
         return ContentView()
-        .environmentObject(state)
+            .environmentObject(state)
+            .environment(\.colorScheme, .dark)
     }
 }
