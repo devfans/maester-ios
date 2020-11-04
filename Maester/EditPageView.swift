@@ -15,7 +15,7 @@ struct EditPageView: View {
     var page: Page
     
     var body: some View {
-        return NewPageView(page_id: page_id, page: page).navigationBarTitle("Edit Page")
+        return NewPageView(page_id: page_id, page: page).navigationBarTitle("edit_page")
     }
 }
 
@@ -23,7 +23,7 @@ struct CreatePageView: View {
     var page_id: String
     var page: Page
     var body: some View {
-        NewPageView(page_id: page_id, page: page).navigationBarTitle("New Page")
+        NewPageView(page_id: page_id, page: page).navigationBarTitle("new_page")
     }
 }
 

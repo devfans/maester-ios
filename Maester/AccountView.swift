@@ -24,7 +24,7 @@ struct AccountView: View {
                     Text("Maester").font(.system(size: 40)).italic().foregroundColor(MaesterConstants.faceBlue)
                      Spacer()
                  }
-                 Text("Manage Your Pages Easily").font(.caption).foregroundColor(.gray).italic()
+                 Text("slogan").font(.caption).foregroundColor(.gray).italic()
              }.padding(.top, 100)
                  .padding(.bottom, 10)
              
@@ -42,7 +42,7 @@ struct AccountView: View {
              }) {
                 HStack {
                      Spacer()
-                     Text("Synchronize")
+                     Text("sync")
                          .font(.headline)
                          .foregroundColor(.white)
                          .padding(.vertical, 10.0)
@@ -60,7 +60,7 @@ struct AccountView: View {
             }) {
                HStack {
                     Spacer()
-                    Text("Logout")
+                    Text("logout")
                         .font(.headline)
                         .foregroundColor(.white)
                         .padding(.vertical, 10.0)

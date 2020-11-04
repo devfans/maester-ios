@@ -28,7 +28,13 @@ struct LoginView: View {
     @EnvironmentObject var state: MaesterState
     @State var user: String = ""
     @State var pass: String = ""
-    @State var info = "Please input your AccountName(length >= 4) and Password(length >= 8)."
+    static let hint_login_input: LocalizedStringKey = "hint_login_input"
+    static let hint_login_success: LocalizedStringKey = "hint_login_success"
+    static let hint_login_network_error: LocalizedStringKey = "hint_login_network_error"
+    static let hint_login_server_error: LocalizedStringKey = "hint_login_server_error"
+    static let hint_login_invalid: LocalizedStringKey = "hint_login_invalid"
+    static let hint_login_processing: LocalizedStringKey = "hint_login_processing"
+    @State var info = hint_login_input
     
     func valid_input() -> Bool {
         self.user.count >= 4 && self.pass.count >= 4
@@ -40,16 +46,16 @@ struct LoginView: View {
             if let status = res {
                 switch status {
                 case .In:
-                    self.info = "Login is successful!"
+                    self.info = LoginView.hint_login_success
                 case .Out:
-                    self.info = "Please check your network connection, and try again later!"
+                    self.info = LoginView.hint_login_network_error
                 case .Login:
-                    self.info = "Invalid credential, please check your input!"
+                    self.info = LoginView.hint_login_invalid
                 default:
                     print("login res: \(status)")
                 }
             } else {
-                self.info = "Server is unavailable for now."
+                self.info = LoginView.hint_login_server_error
             }
         }
     }
@@ -62,7 +68,7 @@ struct LoginView: View {
                     Text("Maester").font(.system(size: 40)).italic().foregroundColor(self.state.style.tintColor)
                     Spacer()
                 }
-                Text("Manage Your Pages Easily").font(.caption).foregroundColor(self.state.style.captionColor).italic()
+                Text("slogan").font(.caption).foregroundColor(self.state.style.captionColor).italic()
             }.padding(.top, 100)
                 .padding(.bottom, 10)
             
@@ -75,30 +81,30 @@ struct LoginView: View {
                 Divider().padding(.bottom, 50)
                 */
             VStack(alignment: .leading) {
-                Text("Account Name")
+                Text("account")
                     .font(.headline).foregroundColor(self.state.style.captionColor)
-                TextField("Username/Email Address", text: $user)
+                TextField("ph_account", text: $user)
                     .padding(.all)
                     .background(self.state.style.fieldBackgroundColor)
                     .lineLimit(1)
             }
             
             VStack(alignment: .leading) {
-                Text("Password")
+                Text("password")
                     .font(.headline).foregroundColor(self.state.style.captionColor)
-                SecureField("Password", text: $pass)
+                SecureField("ph_password", text: $pass)
                     .padding(.all)
                     .background(self.state.style.fieldBackgroundColor)
                     .lineLimit(1)
             }
             
             Button(action: {
-                self.info = "Login in progress now, please wait..."
+                self.info = LoginView.hint_login_processing
                 self.login()
             }) {
                HStack {
                     Spacer()
-                    Text("Login")
+                    Text("login")
                         .font(.headline)
                         .foregroundColor(self.state.style.textForegroundColor)
                         .padding(.vertical, 10.0)
@@ -122,6 +128,6 @@ struct LoginView: View {
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
         let state = MaesterState()
-        return LoginView().environmentObject(state)
+        return LoginView().environmentObject(state).environment(\.locale, .init(identifier: "zh"))
     }
 }

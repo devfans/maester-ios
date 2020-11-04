@@ -20,9 +20,9 @@ struct HistoryView: View {
     // @State private var show_page_detail = false
     
     private func delete_page () {
-        if let page_id = self.delete_page_id {
-            print("Deleting page \(page_id)")
-            let action = PageAction.Delete(page_id)
+        if let pid = self.delete_page_id {
+            print("Deleting page \(pid)")
+            let action = PageAction.Delete(pid)
             _ = self.state.book.apply_action(action: action)
             self.state.sync()
             print("Deleted page")
@@ -38,7 +38,7 @@ struct HistoryView: View {
     var body: some View {
         VStack {
             HStack {
-                Text("Browse History")
+                Text("browse_history")
                     .font(.title).foregroundColor(self.state.style.captionColor)
                 Spacer()
             }.padding(.leading, 30)
@@ -46,22 +46,21 @@ struct HistoryView: View {
             NavigationLink(destination: PageDetailView(page_id: $page_id, page: $page), tag: 1, selection: self.$nav_detail) { Text("") }
             
             List {
-                ForEach(self.state.book.history.indices, id: \.self) { index in
+                ForEach(self.state.book.history, id: \.self) { i in
                     Group {
                         HStack {
                             Button (action: {
-                                let page = self.state.book.history[index]
                                 // self.state.read_page = page.1
                                 // self.state.read_page_id = page.0
                                 // self.state.entry = .PageDetail
                                 // self.state.show_recent_page_detail = true
-                                self.page = page.1
-                                self.page_id = page.0
+                                self.page = i.page
+                                self.page_id = i.id
                                 self.nav_detail = 1
                                 self.state.check_sync()
                                 
                             }) {
-                                PageRow(page_id: self.state.book.history[index].0, page: self.state.book.history[index].1)
+                                PageRow(page_id: i.id, page: i.page)
                             }.buttonStyle(BorderlessButtonStyle())
                             .padding(.vertical, 0).padding(.trailing, -4)
                             // .background(Color.green)
@@ -69,10 +68,9 @@ struct HistoryView: View {
                              PageDetailView(tab_selection: self.$selection).environmentObject(self.state)
                              }*/
                             Button (action: {
-                                let page = self.state.book.history[index].1
-                                switch page.page_type {
+                                switch i.page.page_type {
                                 case .Link:
-                                    if let url = URL(string: page.content) {
+                                    if let url = URL(string: i.page.content) {
                                         UIApplication.shared.open(url)
                                         // _ = NSWorkspace.shared.open(url)
                                     }
@@ -80,7 +78,7 @@ struct HistoryView: View {
                                     print("A note")
                                 }
                             }) {
-                                PageLauncher(width: 32, height: 50, page_type: self.state.book.history[index].1.page_type)
+                                PageLauncher(width: 32, height: 50, page_type: i.page.page_type)
                             }.buttonStyle(BorderlessButtonStyle())
                             .padding(.vertical, -4)
                         }.padding(.vertical, 0)
@@ -88,21 +86,21 @@ struct HistoryView: View {
                 }
                 .onDelete(perform: {index in
                     if let index_value = index.first {
-                        let page = self.state.book.history[index_value]
-                        self.delete_page_id = page.0
+                        let item = self.state.book.history[index_value]
+                        self.delete_page_id = item.id
                         self.show_delete_alert = true
-                        print("Will remove \(page.1.name)")
+                        print("Will remove \(item.id)")
                     }
                     
                 }).alert(isPresented: $show_delete_alert) {
-                    Alert(title: Text("Delete Page"), message: Text("Are you sure to remove this page?"), primaryButton: .destructive(Text("Delete")) {
+                    Alert(title: Text("delete_page"), message: Text("hint_delete"), primaryButton: .destructive(Text("delete")) {
                         self.delete_page()
-                        self.show_delete_alert = false
                     }, secondaryButton: .cancel()
                     )
                 }.padding(.vertical, 0).listRowBackground(self.state.style.listBackground)
             }
         }.padding(.top, -20)
+        .onAppear(perform: {})
     }
 }
 

@@ -1,0 +1,54 @@
+/* 
+  Localizable.strings
+  Maester
+
+  Created by Stefan Liu on 2020/11/4.
+  Copyright © 2020 Stefan Liu. All rights reserved.
+*/
+"login"="Login";
+"account"="Account";
+"ph_account"="Email/Username";
+"ph_password"="Password";
+"password"="Password";
+"slogan"="Manage You Pages Easily";
+"hint_login_input"="Please input your AccountName(length >= 4) and Password(length >= 8).";
+"hint_login_success"="Login is successful!";
+"hint_login_network_error"="Please check your network connection, and try again later!";
+"hint_login_invalid"="Invalid credential, please check your input!";
+"hint_login_server_error"="Server is unavailable for now.";
+"hint_login_processing"="Login in progress now, please wait...";
+"recent"="Recent";
+"search"="Search";
+"sync"="Synchronize";
+"logout"="Logout";
+"ph_search"="Search Tags, Categories, Keyword";
+"tags"="Tags";
+"tag"="Tag";
+"categories"="Categories";
+"category"="Category";
+"searching"="Searching:";
+"delete"="Delete";
+"search_results"="Search Results";
+"delete_page"="Delete Page";
+"hint_delete"="Are you sure to remove this page?";
+"found: %@"="Found: %@";
+"edit_page"="Edit Page";
+"new_page"="New Page";
+"browse_history"="Browse History";
+"name"="Name";
+"open"="Open";
+"content"="Content";
+"edit"="Edit";
+"page_detail"="Page Detail";
+"type"="Type";
+"date_created"="Date Created";
+"page_saved"="Page has been saved!";
+"save"="Save";
+"add"="Add";
+"ph_add_tag"="Add a new tag";
+"ph_content"="Page Content (Required)";
+"ph_category"="Page Category (Required)";
+"link"="Link";
+"note"="Note";
+"keyword"="Keyword";
+

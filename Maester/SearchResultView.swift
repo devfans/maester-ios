@@ -17,7 +17,8 @@ struct SearchResultView: View {
     @State var tab_selection = 0
     @State private var nav_detail: Int? = 0
     
-    private let search_types = ["keyword", "category", "tag", "name", "content"]
+    private let search_types: [LocalizedStringKey] = ["keyword", "category", "tag", "name", "content"]
+
     @State private var show_delete_alert = false
     @State private var delete_page_id: String? = nil
     @State private var page_id = ""
@@ -48,11 +49,11 @@ struct SearchResultView: View {
         }
         return VStack {
             HStack {
-                Text("Searching:")
+                Text("searching")
                     .font(.subheadline).foregroundColor(self.state.style.captionForegroundColor)
                 Text(self.state.search_keyword).font(.subheadline).foregroundColor(self.state.style.textColor)
                 Spacer()
-                Text("Found: \(self.state.search_results.count)").foregroundColor(self.state.style.captionForegroundColor).font(.footnote)
+                Text("found: \(self.state.search_results.count)").foregroundColor(self.state.style.captionForegroundColor).font(.footnote)
             }.padding(.leading, 10).padding(.trailing, 10)
             
             Picker(selection: pi, label: Text("")) {
@@ -115,15 +116,14 @@ struct SearchResultView: View {
                     }
                     
                 }).alert(isPresented: $show_delete_alert) {
-                    Alert(title: Text("Delete Page"), message: Text("Are you sure to remove this page?"), primaryButton: .destructive(Text("Delete")) {
+                    Alert(title: Text("delete_page"), message: Text("hint_delete"), primaryButton: .destructive(Text("delete")) {
                         self.delete_page()
-                        self.show_delete_alert = false
                     }, secondaryButton: .cancel()
                     )
                 }
             }
             Spacer()
-        }.padding(.vertical, 5).navigationBarTitle("Search Results")
+        }.padding(.vertical, 5).navigationBarTitle("search_results")
     }
 }
 

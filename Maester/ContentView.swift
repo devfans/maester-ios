@@ -201,7 +201,7 @@ struct ContentView: View {
                     SearchView(search_keyword: "").tabItem {
                         VStack {
                             Image("search").renderingMode(.template)
-                            Text("Search")
+                            Text("search")
                         }.foregroundColor(MaesterConstants.faceBlue)
                     }
                     .tag(0)
@@ -209,7 +209,7 @@ struct ContentView: View {
                     HistoryView().tabItem {
                         VStack {
                             Image("recent").renderingMode(.template)
-                            Text("Recent")
+                            Text("recent")
                         }.foregroundColor(MaesterConstants.faceBlue)
                     }.tag(1)
                 }

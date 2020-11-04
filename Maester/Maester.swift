@@ -99,6 +99,24 @@ enum SyncStatus: String {
     case Login
 }
 
+struct Item: Hashable {
+    static func == (lhs: Item, rhs: Item) -> Bool {
+        return lhs.id == rhs.id
+    }
+    
+    public var id: String
+    public var page: Page
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    init(_ id: String, _ page: Page) {
+        self.id = id
+        self.page = page
+    }
+}
+
 struct MaesterStyle {
     public let fieldColor: Color
     public let fieldBackgroundColor: Color
@@ -213,7 +231,7 @@ class MaesterBook {
     
     let server = Server.shared
     var entity = StoreEntity()
-    var history = [(String, Page)]()
+    var history = [Item]()
     var tags = [String: Int]()
     var categories = [String: Int]()
     var sync_status = SyncStatus.Out
@@ -307,7 +325,7 @@ class MaesterBook {
     
     public func insert_into_history(id: String, page: Page) {
         self.remove_from_history(id: id)
-        self.history.insert((id, page), at: 0)
+        self.history.insert(Item(id, page), at: 0)
         
         if self.history.count > 100 {
             _ = self.history.popLast()
@@ -315,7 +333,9 @@ class MaesterBook {
     }
     
     public func remove_from_history(id: String) {
-        self.history.removeAll(where: { $0.0 == id })
+        print("Removing from history for \(id)")
+        // self.history.removeAll(where: { $0.0 == id })
+        self.history.removeAll(where: {$0.id == id })
     }
     
     public func apply_page_index(_ page: Page) {
@@ -500,7 +520,7 @@ class MaesterBook {
             for action in message.actions {
                 if case PageAction.Put(_, let page) = action {
                     let page_id = page.gen_id()
-                    if !self.history.contains(where: {id, _ in id == page_id}) {
+                    if !self.history.contains(where: {i in i.id == page_id}) {
                         self.insert_into_history(id: page_id, page: page)
                     }
                 } else if case PageAction.Delete(let id) = action {
@@ -626,7 +646,7 @@ class MaesterBook {
         let profile = Profile(in_token: profile_token)
         profile.local_store = LocalStore(
             entity: self.entity,
-            history: self.history.prefix(50).map {id, _ in id}.reversed(),
+            history: self.history.prefix(50).map {i in i.id}.reversed(),
             queue: self.actions
         )
         
@@ -660,7 +680,7 @@ class MaesterBook {
         
         profile.local_store = LocalStore(
             entity: self.entity,
-            history: self.history.prefix(50).map { id, _ in id }.reversed(),
+            history: self.history.prefix(50).map { i in i.id }.reversed(),
             queue: self.actions
         )
         

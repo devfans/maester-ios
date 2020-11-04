@@ -11,7 +11,7 @@ import SwiftUI
 struct LabelText: View {
     @EnvironmentObject var state: MaesterState
     
-    var label: String
+    var label: LocalizedStringKey
     var value: String
     
     var body: some View {
@@ -42,6 +42,17 @@ struct PageDetailView: View {
     @State var nav_result = false
     @Binding var page_id: String
     @Binding var page: Page
+    static private let page_types = [PageType.Link, PageType.Note]
+    static let link: LocalizedStringKey = "link"
+    static let note: LocalizedStringKey = "note"
+    static private let page_types_text = [link, note]
+    
+    private func get_page_type(_ t: PageType) -> LocalizedStringKey {
+        if let i = Self.page_types.firstIndex(of: t) {
+            return Self.page_types_text[i]
+        }
+        return ""
+    }
     
     private func delete_page () {
         let action = PageAction.Delete(page_id)
@@ -66,32 +77,32 @@ struct PageDetailView: View {
             VStack(alignment: .leading) {
                 NavigationLink(destination: EditPageView(page_id: page_id, page: page), tag: 1, selection: self.$nav_edit) { Text("") }
                 NavigationLink("", destination: SearchResultView(), isActive: $nav_result)
-                HStack {
-                    Text("Category")
+                VStack(alignment: .leading) {
+                    Text("category")
                         .font(.headline)
-                        .foregroundColor(MaesterConstants.faceBlue)
-                    Button(action: {
-                        self.state.search_type = SearchType.Category.rawValue
-                        // self.state.search_keyword = page.category
-                        // self.state.search_selection = 1
-                        self.state.search_for(page.category)
-                        self.nav_result = true
-                    }) {
-                        Text(page.category)
-                            .foregroundColor(self.state.style.tagForegroundColor)
-                            .padding(.horizontal, 8.0)
-                            .padding(.vertical, 2.0)
-                            .background(self.state.style.tagBackgroundColor)
+                    HStack {
+                        Button(action: {
+                            self.state.search_type = SearchType.Category.rawValue
+                            // self.state.search_keyword = page.category
+                            // self.state.search_selection = 1
+                            self.state.search_for(page.category)
+                            self.nav_result = true
+                        }) {
+                            Text(page.category)
+                                .foregroundColor(self.state.style.tagForegroundColor)
+                                .padding(.horizontal, 8.0)
+                                .padding(.vertical, 4.0)
+                                .background(self.state.style.tagBackgroundColor)
+                        }
+                        .cornerRadius(6.0)
                     }
-                    .cornerRadius(6.0)
-                    .padding(.vertical, 1)
-                    .padding(.horizontal, 1)
-                    
                 }.padding(.horizontal, 10)
-                LabelText(label: "Name", value: page.name)
+                .padding(.vertical, 5)
+                
+                LabelText(label: "name", value: page.name)
                 
                 VStack(alignment: .leading) {
-                    Text("Tags")
+                    Text("tags")
                         .font(.headline)
                     
                     HStack{
@@ -126,13 +137,13 @@ struct PageDetailView: View {
                 
                 VStack(alignment: .leading) {
                     HStack {
-                        Text("Type")
+                        Text("type")
                             .font(.headline)
                         
                         Spacer()
                     }.padding(.vertical, 10)
                     HStack {
-                        Text(page.page_type.rawValue)
+                        Text(self.get_page_type(page.page_type))
                             .foregroundColor(self.state.style.subtitleColor)
                             .padding(.vertical, 10)
                             .padding(.horizontal, 10)
@@ -143,7 +154,7 @@ struct PageDetailView: View {
                                 UIApplication.shared.open(url)
                             }
                         }) {
-                            Text("Open")
+                            Text("open")
                                 .padding(.vertical, 10)
                                 .padding(.horizontal, 16)
                                 .foregroundColor(Color.white)
@@ -158,7 +169,7 @@ struct PageDetailView: View {
                 // LabelText(label: "Content", value: self.state.read_page.content)
                 VStack(alignment: .leading) {
                     HStack {
-                        Text("Content")
+                        Text("content")
                             .font(.headline)
                         Spacer()
                     }.padding(.vertical, 10)
@@ -181,7 +192,7 @@ struct PageDetailView: View {
                     }
                     
                 }.padding(.horizontal, 10).frame(height: 250)
-                LabelText(label: "Date Created", value: String(page.time))
+                LabelText(label: "date_created", value: String(page.time))
                 
                 Spacer()
                 VStack {
@@ -200,7 +211,7 @@ struct PageDetailView: View {
                     }) {
                         HStack {
                             Spacer()
-                            Text("Edit")
+                            Text("edit")
                                 .font(.headline)
                                 .foregroundColor(.white)
                                 .padding(.vertical, 10.0)
@@ -218,7 +229,7 @@ struct PageDetailView: View {
                     }) {
                         HStack {
                             Spacer()
-                            Text("Delete")
+                            Text("delete")
                                 .font(.headline)
                                 .foregroundColor(.white)
                                 .padding(.vertical, 10.0)
@@ -234,9 +245,9 @@ struct PageDetailView: View {
             }
         }
         .padding(.horizontal, 25)
-        .padding(.top, 0).navigationBarTitle("Page Detail")
+        .padding(.top, 0).navigationBarTitle("page_detail")
         .alert(isPresented: $show_delete_alert) {
-            Alert(title: Text("Delete Page"), message: Text("Are you sure to remove this page?"), primaryButton: .destructive(Text("Delete")) {
+            Alert(title: Text("delete_page"), message: Text("hint_delete"), primaryButton: .destructive(Text("delete")) {
                 self.delete_page()
                 self.show_delete_alert = false
             }, secondaryButton: .cancel()

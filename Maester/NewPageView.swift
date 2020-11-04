@@ -10,8 +10,8 @@ import SwiftUI
 import UIKit
 
 struct LabelTextField: View {
-    var label: String
-    var placeholder: String
+    var label: LocalizedStringKey
+    var placeholder: LocalizedStringKey
     @Binding var value: String
     
     @EnvironmentObject var state: MaesterState
@@ -76,15 +76,19 @@ struct InputSuggestion: View {
 
 struct NewPageView: View {
     @EnvironmentObject var state: MaesterState
-    // @Environment(\.presentationMode) var presentationMode
+    
+    @Environment(\.presentationMode) var presentationMode
     @State var new_tag = ""
     
     var page_id: String
     @State var page: Page
     @State private var page_type = 0
+    @State private var show_alert = false
     
     static private let page_types = [PageType.Link, PageType.Note]
-    static private let page_types_text = ["Link", "Note"]
+    static let link: LocalizedStringKey = "link"
+    static let note: LocalizedStringKey = "note"
+    static private let page_types_text = [link, note]
     
     // private var back: MainPage
     /*
@@ -112,18 +116,18 @@ struct NewPageView: View {
         ScrollView(/*@START_MENU_TOKEN@*/.vertical/*@END_MENU_TOKEN@*/, showsIndicators: false) {
             VStack {
                 Group {
-                    LabelTextField(label: "Name", placeholder: "New Page", value: self.$page.name)
-                    LabelTextField(label: "Category", placeholder: "Page Category (Required)", value: self.$page.category)
+                    LabelTextField(label: "name", placeholder: "new_page", value: self.$page.name)
+                    LabelTextField(label: "category", placeholder: "ph_category", value: self.$page.category)
                     InputSuggestion(book: $state.book.categories, value: self.$page.category)
                     VStack {
                         HStack {
-                            Text("Type").font(.headline)
+                            Text("type").font(.headline)
                             Spacer()
                         }
                         
                         Picker(selection: self.$page_type, label: Text("")) {
                             ForEach(Self.page_types.indices) {
-                                Text(Self.page_types[$0].rawValue)
+                                Text(Self.page_types_text[$0])
                             }
                         }.pickerStyle(SegmentedPickerStyle())//.foregroundColor(MaesterConstants.lightBlue)
                     }
@@ -132,16 +136,16 @@ struct NewPageView: View {
                 // LabelTextField(label: "Content", placeholder: "Page Content (Required)", value: $state.write_page.content)
                 
                 VStack(alignment: .leading) {
-                    Text("Content")
+                    Text("content")
                         .font(.headline)
                     ScrollView {
-                        TextField("Page Content (Required)", text: $page.content).padding(.top, 0).lineLimit(5)
+                        TextField("ph_content", text: $page.content).padding(8).lineLimit(5)
                         // MultilineTextField("Page Content (Required)", text: $state.write_page.content, onCommit: nil)
                     }.lineLimit(5).frame(minHeight: 100, alignment: .leading)
                     .background(self.state.style.fieldBackgroundColor)
                 }
                 VStack(alignment: .leading) {
-                    Text("Tags")
+                    Text("tags")
                         .font(.headline)
                     HStack{
                         ForEach(page.tags, id: \.self) { tag in
@@ -165,7 +169,7 @@ struct NewPageView: View {
                         }
                     }
                     HStack {
-                        TextField("Add a new tag", text: $new_tag)
+                        TextField("ph_add_tag", text: $new_tag)
                             .padding(.all)
                             .background(self.state.style.fieldBackgroundColor)
                         Button(action: {
@@ -175,7 +179,7 @@ struct NewPageView: View {
                             self.new_tag = ""
                             
                         }) {
-                            Text("Add")
+                            Text("add")
                                 .padding(.horizontal, 20)
                                 .padding(.vertical, 15)
                                 .background(MaesterConstants.faceBlue)
@@ -189,10 +193,11 @@ struct NewPageView: View {
                 InputSuggestion(book: $state.book.tags, value: $new_tag)
                 Spacer()
                 Button(action: {
-                    let action = PageAction.Put(self.page_id, page)
                     if self.page_type < Self.page_types.count {
                         page.page_type = Self.page_types[self.page_type]
                     }
+                    let action = PageAction.Put(self.page_id, page)
+                    // print("page type \(self.page_type)")
                     
                     _ = self.state.book.apply_action(action: action)
                     self.state.sync()
@@ -202,10 +207,12 @@ struct NewPageView: View {
                     // self.presentationMode.wrappedValue.dismiss()
                     self.state.show_new_page = false
                     self.state.search()
+                    self.show_alert = true
+                    self.presentationMode.wrappedValue.dismiss()
                 }) {
                     HStack {
                         Spacer()
-                        Text("Save")
+                        Text("save")
                             .font(.headline)
                             .foregroundColor(.white)
                             .padding(.vertical, 10.0)
@@ -244,6 +251,9 @@ struct NewPageView: View {
         }
         .padding(.top, 30)
         .padding(.horizontal, 25.0)
+        .alert(isPresented: $show_alert) {
+            Alert(title: Text(""), message: Text("page_saved"))
+        }
     }
 }
 

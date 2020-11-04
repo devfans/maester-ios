@@ -67,7 +67,7 @@ struct SearchView: View {
                 // NavigationLink("", destination: SearchResultView(), isActive: $nav_result)
                 
                 HStack {
-                    TextField("Search Tags, Categories, Keyword", text: $search_keyword)
+                    TextField("ph_search", text: $search_keyword)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 16).background(self.state.style.fieldBackgroundColor)
                     
@@ -79,7 +79,7 @@ struct SearchView: View {
                         // self.state.search_selection = 1
                         self.nav_result = 1
                     }) {
-                        Text("Search")
+                        Text("search")
                             .padding(.vertical, 17)
                             .padding(.horizontal, 12)
                     }.disabled(self.search_keyword.count < 1)
@@ -90,7 +90,7 @@ struct SearchView: View {
             }.padding(.bottom, 10)
             VStack {
                 HStack {
-                    Text("Tags")
+                    Text("tags")
                         .foregroundColor(self.state.style.subtitleColor)
                         .padding(.leading, 20)
                     Spacer()
@@ -105,7 +105,7 @@ struct SearchView: View {
             
             VStack {
                 HStack {
-                    Text("Categories")
+                    Text("categories")
                         .foregroundColor(self.state.style.subtitleColor)
                         .padding(.leading, 20)
                     Spacer()
