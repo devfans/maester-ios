@@ -10,6 +10,8 @@
 		F80D6FB925443BC500A90235 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80D6FB825443BC500A90235 /* HistoryView.swift */; };
 		F80D70162552455500A90235 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F80D70192552455500A90235 /* Localizable.strings */; };
 		F80D70172552455500A90235 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F80D70192552455500A90235 /* Localizable.strings */; };
+		F80D703E25528BCF00A90235 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F80D702C25528B3C00A90235 /* CloudKit.framework */; };
+		F80D703F25528BCF00A90235 /* CloudKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F80D702C25528B3C00A90235 /* CloudKit.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F859261723E7E5B5001EDE5C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F859261623E7E5B5001EDE5C /* AppDelegate.swift */; };
 		F859261923E7E5B5001EDE5C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F859261823E7E5B5001EDE5C /* SceneDelegate.swift */; };
 		F859261C23E7E5B5001EDE5C /* Maester.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F859261A23E7E5B5001EDE5C /* Maester.xcdatamodeld */; };
@@ -64,6 +66,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		F80D704025528BCF00A90235 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				F80D703F25528BCF00A90235 /* CloudKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F859266423E966CB001EDE5C /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -83,6 +96,7 @@
 		F80D70062552441500A90235 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainInterface.strings"; sourceTree = "<group>"; };
 		F80D70182552455500A90235 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		F80D701E2552455900A90235 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		F80D702C25528B3C00A90235 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		F859261323E7E5B5001EDE5C /* Maester.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Maester.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F859261623E7E5B5001EDE5C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F859261823E7E5B5001EDE5C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -122,6 +136,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F80D703E25528BCF00A90235 /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -149,6 +164,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F80D702B25528B3C00A90235 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F80D702C25528B3C00A90235 /* CloudKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F859260A23E7E5B5001EDE5C = {
 			isa = PBXGroup;
 			children = (
@@ -158,6 +181,7 @@
 				F859263A23E7E5B6001EDE5C /* MaesterUITests */,
 				F859268923EDDC61001EDE5C /* MSE */,
 				F859261423E7E5B5001EDE5C /* Products */,
+				F80D702B25528B3C00A90235 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -248,6 +272,7 @@
 				F859261023E7E5B5001EDE5C /* Frameworks */,
 				F859261123E7E5B5001EDE5C /* Resources */,
 				F859266423E966CB001EDE5C /* Embed App Extensions */,
+				F80D704025528BCF00A90235 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -624,6 +649,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Maester/Maester.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Maester/Preview Content\"";
 				DEVELOPMENT_TEAM = HBBSBKXTST;
@@ -636,6 +662,7 @@
 				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.devfans.maester.Maester;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -647,6 +674,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Maester/Maester.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Maester/Preview Content\"";
 				DEVELOPMENT_TEAM = HBBSBKXTST;
@@ -659,6 +687,7 @@
 				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.devfans.maester.Maester;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
